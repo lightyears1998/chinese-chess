@@ -1,27 +1,31 @@
 // 绘制棋盘
 function checkerboard() {	
 	// 外框
-	context.beginPath();
+ 	context.beginPath();
 	context.moveTo(0,0);
-	context.lineTo(boxWidth,0);
-	context.lineTo(boxWidth, boxHeight);
-	context.lineTo(0, boxHeight);	
+	context.lineTo(canvasWidth,0);
+	context.lineTo(canvasWidth, canvasHeight);
+	context.lineTo(0, canvasHeight);	
 	context.lineTo(0,0);
 	context.lineWidth = 6;
 	context.strokeStyle= "red";
 	context.stroke();
-	context.closePath();
+	context.closePath(); 
 	var ceilWidth = Math.ceil(boxWidth / 8);    // 棋盘上每个格子的宽
 	var ceilHeight = Math.ceil(boxHeight / 9);  // 棋盘上每个格子的高
-	for(var i=1; i<=8; i++) {        // 横线
-		cross(0, i*ceilHeight, boxWidth, i*ceilHeight, 3);
+	for(var i=0; i<=9; i++) {        // 横线
+		cross(0, i*ceilHeight, ceilWidth*8, i*ceilHeight, 3);
 	}
-	for(var i=1; i<=8; i++) {     // 上棋盘竖线
+	for(var i=0; i<=8; i++) {     // 竖线
+		if(i==0 || i==8){
+			cross(i*ceilWidth, 0, i*ceilWidth, ceilHeight*9, 3);
+		}
+		else {
+			cross(i*ceilWidth, 0, i*ceilWidth, 4*ceilHeight, 3);
+			cross(i*ceilWidth, 5*ceilHeight, i*ceilWidth, ceilHeight*9, 3);
+		}
 		cross(i*ceilWidth, 0, i*ceilWidth, 4*ceilHeight, 3);
-	}
-	for(var i=1; i<=8; i++) {    // 下棋盘竖线
-		cross(i*ceilWidth, 5*ceilHeight, i*ceilWidth, boxHeight, 3);
-	}	
+	}		
 	cross(3*ceilWidth, 0, 5*ceilWidth, 2*ceilHeight, 3);      // 上棋盘斜线
 	cross(5*ceilWidth, 0, 3*ceilWidth, 2*ceilHeight, 3);
 	cross(3*ceilWidth, 7*ceilHeight, 5*ceilWidth, 9*ceilHeight, 3);   // 下棋盘斜线
@@ -82,27 +86,32 @@ function checkerboard() {
 			cross(ceilWidth*i+disX, ceilHeight*6+disY, ceilWidth*i+disX, ceilHeight*6+disY+lineH, 1);
 		}
 	}
+	context.beginPath();
+	context.arc(8*ceilWidth+paddingX, 9*ceilHeight+paddingY, ceilWidth*0.37, 0, 2*Math.PI);
+	context.closePath();
+	context.stroke();
+/* 	context.beginPath();
+	context.arc(7*ceilWidth+paddingX,9*ceilHeight+paddingY,ceilWidth*0.37,0,2*Math.PI);
+	context.closePath();
+	context.stroke();
+	context.beginPath();
+	context.arc(7*ceilWidth+paddingX,8*ceilHeight+paddingY,ceilWidth*0.37,0,2*Math.PI);
+	context.closePath();
+	context.stroke(); */
+	
+	//context.font = "fontSize KaiTi";
+	context.font = "45px KaiTi";
+	context.fillStyle = "red";
+	context.fillText("楚河",ceilWidth*1,ceilHeight*5);
+	context.fillText("汉界",ceilWidth*7,ceilHeight*5);
 }
 // 画线
 function cross(sx, sy, ex, ey, bw) {
 	context.beginPath();
-	context.moveTo(sx, sy);
-	context.lineTo(ex, ey);
+	context.moveTo(sx+paddingX, sy+paddingY);
+	context.lineTo(ex+paddingX, ey+paddingY);
 	context.strokeStyle =  "red";
 	context.lineWidth = bw;
 	context.stroke();
 	context.closePath();
 }
-
-/* function chessPiecesInit() {
-	$("#redSoldier1").css({"top":420, "left": 0});
-	$("#redSoldier2").css({"top":420, "left": 140});
-	$("#redSoldier3").css({"top":420, "left": 280});
-	$("#redSoldier4").css({"top":420, "left": 420});
-	$("#redSoldier5").css({"top":420, "left": 560});
-	$("#redCannon1").css({"top":490, "left":70} ); 
-	$("#redCannon2").css({"top":490, "left":490} ); 
-	$("#redGeneral").css({"top":630, "left":280} ); 
-	console.log(1);
-	
-} */
