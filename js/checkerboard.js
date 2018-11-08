@@ -3,123 +3,85 @@ function checkerboard() {
 	// 外框
 	context.beginPath();
 	context.moveTo(0,0);
-	context.lineTo(560,0);
-	context.lineTo(560,630);
-	context.lineTo(0,630);	
+	context.lineTo(boxWidth,0);
+	context.lineTo(boxWidth, boxHeight);
+	context.lineTo(0, boxHeight);	
 	context.lineTo(0,0);
 	context.lineWidth = 6;
 	context.strokeStyle= "red";
 	context.stroke();
 	context.closePath();
-	for(var i=1; i<=8; i++) {     // 横线
-		cross(0, i*70, 560, i*70, 3);
+	var ceilWidth = Math.ceil(boxWidth / 8);    // 棋盘上每个格子的宽
+	var ceilHeight = Math.ceil(boxHeight / 9);  // 棋盘上每个格子的高
+	for(var i=1; i<=8; i++) {        // 横线
+		cross(0, i*ceilHeight, boxWidth, i*ceilHeight, 3);
 	}
 	for(var i=1; i<=8; i++) {     // 上棋盘竖线
-		cross(i*70, 0, i*70, 280, 3);
+		cross(i*ceilWidth, 0, i*ceilWidth, 4*ceilHeight, 3);
 	}
 	for(var i=1; i<=8; i++) {    // 下棋盘竖线
-		cross(i*70, 350, i*70, 630, 3);
+		cross(i*ceilWidth, 5*ceilHeight, i*ceilWidth, boxHeight, 3);
+	}	
+	cross(3*ceilWidth, 0, 5*ceilWidth, 2*ceilHeight, 3);      // 上棋盘斜线
+	cross(5*ceilWidth, 0, 3*ceilWidth, 2*ceilHeight, 3);
+	cross(3*ceilWidth, 7*ceilHeight, 5*ceilWidth, 9*ceilHeight, 3);   // 下棋盘斜线
+	cross(3*ceilWidth, 9*ceilHeight, 5*ceilWidth, 7*ceilHeight, 3);
+	var lineW = ceilWidth / 7;   // 折线的宽度
+	var lineH = ceilHeight / 7;  // 折线的高度
+	var disX = ceilWidth / 14;   // 折线距离边框的横向距离
+	var disY = ceilHeight / 14;  // 折线距离边框的纵向距离
+	// 上期盘炮折线
+	for(var i=1; i<=7; i+=6){
+		cross(ceilWidth*i-disX-lineW, ceilHeight*2-disY, ceilWidth*i-disX, ceilHeight*2-disY, 1);    // 上棋盘左炮折线，按左上右上右下左下的顺序
+		cross(ceilWidth*i-disX, ceilHeight*2-disY, ceilWidth*i-disX, ceilHeight*2-disY-lineH, 1);
+		cross(ceilWidth*i+disX, ceilHeight*2-disY, ceilWidth*i+disX+lineW, ceilHeight*2-disY, 1);
+		cross(ceilWidth*i+disX, ceilHeight*2-disY, ceilWidth*i+disX, ceilHeight*2-disY-lineH, 1);
+		cross(ceilWidth*i+disX, ceilHeight*2+disY, ceilWidth*i+disX+lineW, ceilHeight*2+disY, 1);
+		cross(ceilWidth*i+disX, ceilHeight*2+disY, ceilWidth*i+disX, ceilHeight*2+disY+lineH, 1);
+		cross(ceilWidth*i-disX-lineW, ceilHeight*2+disY, ceilWidth*i-disX, ceilHeight*2+disY, 1);    
+		cross(ceilWidth*i-disX, ceilHeight*2+disY, ceilWidth*i-disX, ceilHeight*2+disY+lineH, 1);
 	}
-	cross(210, 0, 350, 140, 3);   // 上棋盘斜线
-	cross(350, 0, 210, 140, 3);
-	cross(210, 630, 350, 490, 3);   // 下棋盘斜线
-	cross(350, 630, 210, 490, 3);
-	cross(55, 135, 65, 135, 1);    // 上棋盘左炮折线，按左上右上右下左下的顺序
-	cross(65, 135, 65, 125, 1);
-	cross(75, 135, 85, 135, 1);
-	cross(75, 135, 75, 125, 1);
-	cross(75, 145, 85, 145, 1);
-	cross(75, 145, 75, 155, 1);
-	cross(55, 145, 65, 145, 1);    
-	cross(65, 145, 65, 155, 1);
-	cross(475, 135, 485, 135, 1);    // 上棋盘右炮折线
-	cross(485, 135, 485, 125, 1);
-	cross(495, 135, 505, 135, 1);
-	cross(495, 135, 495, 125, 1);
-	cross(495, 145, 505, 145, 1);
-	cross(495, 145, 495, 155, 1);
-	cross(475, 145, 485, 145, 1);    
-	cross(485, 145, 485, 155, 1);
-	cross(5, 205, 15, 205);       // 上棋盘兵折线，左兵1
-	cross(5, 205, 5, 195);
-	cross(5, 215, 15, 215);
-	cross(5, 215, 5, 225);
-	cross(125, 205, 135, 205);   // 上棋盘左兵2
-	cross(135, 205, 135, 195);
-	cross(145, 205, 155, 205);
-	cross(145, 205, 145, 195);
-	cross(145, 215, 155, 215);
-	cross(145, 215, 145, 225);
-	cross(125, 215, 135, 215);
-	cross(135, 215, 135, 225);
-	cross(265, 205, 275, 205);   // 上棋盘左兵3
-	cross(275, 205, 275, 195);
-	cross(285, 205, 295, 205);
-	cross(285, 205, 285, 195);
-	cross(285, 215, 295, 215);
-	cross(285, 215, 285, 225);
-	cross(265, 215, 275, 215);
-	cross(275, 215, 275, 225);
-	cross(405, 205, 415, 205);   // 上棋盘左兵4
-	cross(415, 205, 415, 195);
-	cross(425, 205, 435, 205);
-	cross(425, 205, 425, 195);
-	cross(425, 215, 435, 215);
-	cross(425, 215, 425, 225);
-	cross(405, 215, 415, 215);
-	cross(415, 215, 415, 225);
-	cross(545, 205, 555, 205);   // 上棋盘左兵5
-	cross(555, 205, 555, 195);
-	cross(545, 215, 555, 215);
-	cross(555, 215, 555, 225);
-	cross(55, 485, 65, 485, 1);    // 下棋盘左炮折线，按左上右上右下左下的顺序
-	cross(65, 485, 65, 475, 1);
-	cross(75, 485, 85, 485, 1);
-	cross(75, 485, 75, 475, 1);
-	cross(75, 495, 85, 495, 1);
-	cross(75, 495, 75, 505, 1);
-	cross(55, 495, 65, 495, 1);    
-	cross(65, 495, 65, 505, 1);
-	cross(475, 485, 485, 485, 1);    // 下棋盘右炮折线
-	cross(485, 485, 485, 475, 1);
-	cross(495, 485, 505, 485, 1);
-	cross(495, 485, 495, 475, 1);
-	cross(495, 495, 505, 495, 1);
-	cross(495, 495, 495, 505, 1);
-	cross(475, 495, 485, 495, 1);    
-	cross(485, 495, 485, 505, 1);
-	cross(5, 415, 15, 415);      // 下棋盘兵折线，左兵1
-	cross(5, 415, 5, 405);
-	cross(5, 425, 15, 425);
-	cross(5, 425, 5, 435);
-	cross(125, 415, 135, 415);   // 下棋盘左兵2
-	cross(135, 415, 135, 405);
-	cross(145, 425, 155, 425);
-	cross(145, 415, 145, 405);
-	cross(145, 415, 155, 415);
-	cross(145, 425, 145, 435);
-	cross(125, 425, 135, 425);
-	cross(135, 425, 135, 435);
-	cross(265, 415, 275, 415);   // 下棋盘左兵3
-	cross(275, 415, 275, 405);
-	cross(285, 425, 295, 425);
-	cross(285, 415, 285, 405);
-	cross(285, 415, 295, 415);
-	cross(285, 415, 285, 435);
-	cross(265, 425, 275, 425);
-	cross(275, 425, 275, 435);
-	cross(405, 415, 415, 415);   // 下棋盘左兵4
-	cross(415, 415, 415, 405);
-	cross(425, 425, 435, 425);
-	cross(425, 415, 425, 405);
-	cross(425, 415, 435, 415);
-	cross(425, 415, 425, 435);
-	cross(405, 425, 415, 425);
-	cross(415, 425, 415, 435);
-	cross(545, 415, 555, 415);   // 下棋盘左兵5
-	cross(555, 415, 555, 405);
-	cross(545, 425, 555, 425);
-	cross(555, 425, 555, 435);
+	// 上棋盘兵折线
+	for(var i=0; i<=8; i+=2){
+		if(i !== 0){
+			cross(ceilWidth*i-disX-lineW, ceilHeight*3-disY, ceilWidth*i-disX, ceilHeight*3-disY, 1);   
+			cross(ceilWidth*i-disX, ceilHeight*3-disY, ceilWidth*i-disX, ceilHeight*3-disY-lineH, 1);
+			cross(ceilWidth*i-disX-lineW, ceilHeight*3+disY, ceilWidth*i-disX, ceilHeight*3+disY, 1);    
+			cross(ceilWidth*i-disX, ceilHeight*3+disY, ceilWidth*i-disX, ceilHeight*3+disY+lineH, 1);
+		}
+		if(i !== 8){
+			cross(ceilWidth*i+disX, ceilHeight*3-disY, ceilWidth*i+disX+lineW, ceilHeight*3-disY, 1);
+			cross(ceilWidth*i+disX, ceilHeight*3-disY, ceilWidth*i+disX, ceilHeight*3-disY-lineH, 1);
+			cross(ceilWidth*i+disX, ceilHeight*3+disY, ceilWidth*i+disX+lineW, ceilHeight*3+disY, 1);
+			cross(ceilWidth*i+disX, ceilHeight*3+disY, ceilWidth*i+disX, ceilHeight*3+disY+lineH, 1);
+		}
+	}
+	// 下期盘炮折线
+	for(var i=1; i<=7; i+=6){
+		cross(ceilWidth*i-disX-lineW, ceilHeight*7-disY, ceilWidth*i-disX, ceilHeight*7-disY, 1);    // 上棋盘左炮折线，按左上右上右下左下的顺序
+		cross(ceilWidth*i-disX, ceilHeight*7-disY, ceilWidth*i-disX, ceilHeight*7-disY-lineH, 1);
+		cross(ceilWidth*i+disX, ceilHeight*7-disY, ceilWidth*i+disX+lineW, ceilHeight*7-disY, 1);
+		cross(ceilWidth*i+disX, ceilHeight*7-disY, ceilWidth*i+disX, ceilHeight*7-disY-lineH, 1);
+		cross(ceilWidth*i+disX, ceilHeight*7+disY, ceilWidth*i+disX+lineW, ceilHeight*7+disY, 1);
+		cross(ceilWidth*i+disX, ceilHeight*7+disY, ceilWidth*i+disX, ceilHeight*7+disY+lineH, 1);
+		cross(ceilWidth*i-disX-lineW, ceilHeight*7+disY, ceilWidth*i-disX, ceilHeight*7+disY, 1);    
+		cross(ceilWidth*i-disX, ceilHeight*7+disY, ceilWidth*i-disX, ceilHeight*7+disY+lineH, 1);
+	}
+	// 下棋盘兵折线
+	for(var i=0; i<=8; i+=2){
+		if(i !== 0){
+			cross(ceilWidth*i-disX-lineW, ceilHeight*6-disY, ceilWidth*i-disX, ceilHeight*6-disY, 1);   
+			cross(ceilWidth*i-disX, ceilHeight*6-disY, ceilWidth*i-disX, ceilHeight*6-disY-lineH, 1);
+			cross(ceilWidth*i-disX-lineW, ceilHeight*6+disY, ceilWidth*i-disX, ceilHeight*6+disY, 1);    
+			cross(ceilWidth*i-disX, ceilHeight*6+disY, ceilWidth*i-disX, ceilHeight*6+disY+lineH, 1);
+		}
+		if(i !== 8){
+			cross(ceilWidth*i+disX, ceilHeight*6-disY, ceilWidth*i+disX+lineW, ceilHeight*6-disY, 1);
+			cross(ceilWidth*i+disX, ceilHeight*6-disY, ceilWidth*i+disX, ceilHeight*6-disY-lineH, 1);
+			cross(ceilWidth*i+disX, ceilHeight*6+disY, ceilWidth*i+disX+lineW, ceilHeight*6+disY, 1);
+			cross(ceilWidth*i+disX, ceilHeight*6+disY, ceilWidth*i+disX, ceilHeight*6+disY+lineH, 1);
+		}
+	}
 }
 // 画线
 function cross(sx, sy, ex, ey, bw) {
@@ -131,3 +93,16 @@ function cross(sx, sy, ex, ey, bw) {
 	context.stroke();
 	context.closePath();
 }
+
+/* function chessPiecesInit() {
+	$("#redSoldier1").css({"top":420, "left": 0});
+	$("#redSoldier2").css({"top":420, "left": 140});
+	$("#redSoldier3").css({"top":420, "left": 280});
+	$("#redSoldier4").css({"top":420, "left": 420});
+	$("#redSoldier5").css({"top":420, "left": 560});
+	$("#redCannon1").css({"top":490, "left":70} ); 
+	$("#redCannon2").css({"top":490, "left":490} ); 
+	$("#redGeneral").css({"top":630, "left":280} ); 
+	console.log(1);
+	
+} */
