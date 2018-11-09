@@ -1,0 +1,7 @@
+html, body {
+	/*　使元素的高度占据整个屏幕 */
+	margin: 0;
+	border: none;
+	padding: 0;
+	height: 100%;
+}
