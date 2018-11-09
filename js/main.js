@@ -6,13 +6,14 @@ var paddingX, paddingY;   // 棋盘距离外框的距离
 var ceilWidth, ceilHeight;  // 格子大小
 var chessSize;   // 棋子大小
 var chessFontSize;  // 棋子文字大小
-var mark = new Array(10);   // 标记棋盘上该位置是否有棋子
+var mark = new Array();   // 标记棋盘上该位置是否有棋子
+
  // 棋子对象
 var redKing = new Chess("red", "帅", 0, 4);
 	redGuard1 = new Chess("red", "士", 0, 3);
 	redGuard2 = new Chess("red", "士", 0, 5);
-	redBishop1 = new Chess("red", "象", 0, 2);
-	redBishop2 = new Chess("red", "象", 0, 6);
+	redBishop1 = new Chess("red", "相", 0, 2);
+	redBishop2 = new Chess("red", "相", 0, 6);
 	redKnight1 = new Chess("red", "马", 0, 1);
 	redKnight2 = new Chess("red", "马", 0,7);
 	redRook1 = new Chess("red", "车", 0, 0);
@@ -40,16 +41,41 @@ var blackKing = new Chess("black", "将", 9, 4);
 	blackPawn3 = new Chess("black", "卒", 6, 4);
 	blackPawn4 = new Chess("black", "卒", 6, 6);
 	blackPawn5 = new Chess("black", "卒", 6, 8);
+var isClick = false;
+var firstChess;
 $(function(){
-	responisive();     // 响应式设计
+	responsive();     // 响应式设计
 	checkerboard();    // 绘制棋盘
 	init();
-	// 实时监听浏览器宽高变化
-	$(window).resize(function() {
-		responisive();
-		checkerboard();
-		init();
-	});
+});
+/* var timer = setInterval(function(){  // 设置定时器显示棋子，但没用！
+	changeChess();
+},10); */
+// 实时监听鼠标点击
+window.onmousedown = function(event) {
+	var toLeft = event.clientX - canvas.offsetLeft - paddingX;
+	var toTop = event.clientY - canvas.offsetTop - paddingY;
+	var chessY = Math.round(toLeft / ceilWidth);    // 所点击位置的行列
+	var chessX = Math.round(toTop / ceilHeight);
+	if(isClick === false && mark[chessX][chessY] !== 0) {  // 第一次点击，需要点击棋子
+		firstChess = mark[chessX][chessY];    // 记录点击的棋子
+		isClick = true;        // 标记已有第一次点击
+	}
+	else if(isClick === true) {  // 第二次点击，不需要点击棋子
+		mark[chessX][chessY] = firstChess;   // 将棋子移动到第二次点击的位置
+		mark[chessX][chessY].x = chessX;
+		mark[chessX][chessY].y = chessY;
+		mark[firstChess.x][firstChess.y] = 0;  // 清除第一次点击的棋子的所在位置
+		changeChess();
+		isClick = false;  
+		console.log(mark);
+	}
+}
+// 实时监听浏览器宽高变化
+$(window).resize(function() {
+	responsive();
+	checkerboard();
+	changeChess();
 });
 // 棋子的构造函数
 function Chess(group, name, x, y) {
@@ -59,7 +85,7 @@ function Chess(group, name, x, y) {
 	this.y = y;
 }
 // 响应式设计
-function responisive() {
+function responsive() {
 	// 获取浏览器可使用的宽高
 	var browserWidth = window.innerWidth || document.documentElement.clientWidth || document.body.clientWidth;
 	var browserHeight = window.innerHeight || document.documentElement.clientHeight || document.body.clientHeight;
@@ -82,7 +108,7 @@ function responisive() {
 // 初始化mark数组
 function init() {
 	for(var i=0; i<=9; i++){
-		mark[i] = new Array(9);
+		mark[i] = new Array();
 		for(var j=0; j<=8; j++){
 			mark[i][j] = 0;
 		}
@@ -119,10 +145,14 @@ function init() {
 	mark[6][4] = blackPawn3;
 	mark[6][6] = blackPawn4;
 	mark[6][8] = blackPawn5;
-	for(var i=0; i<=9; i++){
+	changeChess();
+}
+// 根据标记数组绘制棋子
+function changeChess() {
+	 for(var i=0; i<=9; i++){
 		for(var j=0; j<=8; j++){
-			drawChess(mark[i][j]);
+			drawChess(mark[i][j]);	
 		}
-	}
+	} 
 }
 

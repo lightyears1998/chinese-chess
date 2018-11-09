@@ -1,5 +1,6 @@
  .box{
 	display: block;
-	position: relative;
+	/* position: relative; */
 	margin: 30px auto;
+	/* border: 1px solid blue; */
 } 
