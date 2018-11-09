@@ -66,6 +66,12 @@ window.onmousedown = function(event) {
 		mark[chessX][chessY].x = chessX;
 		mark[chessX][chessY].y = chessY;
 		mark[firstChess.x][firstChess.y] = 0;  // 清除第一次点击的棋子的所在位置
+		// 清空画布后重绘棋盘
+		{
+			let ctx = canvas.getContext('2d');
+			ctx.clearRect(0, 0, canvas.width, canvas.height);
+			checkerboard();
+		}
 		changeChess();
 		isClick = false;  
 		console.log(mark);
