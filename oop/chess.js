@@ -64,15 +64,23 @@ function ChessGameCanvas(game) {
         this.cellLengh = availableLength / 11;
         this.offsetTop = (parentHeight - availableLength) / 2;
         this.offsetLeft = (parentWidth - availableLength) / 2;
+        [this.cvsChessboard, this.cvsChesses, this.cvsFeedback].forEach(function (cvs) {
+            cvs.style.top = `${this.offsetTop}px`;
+            cvs.style.left = `${this.offsetLeft}px`;
+            cvs.width = `${availableLength}`;
+            cvs.height = `${availableLength}`;
+        }.bind(this));
     }
     
     this.draw = function () {
+        this.updateLength();
         this.drawChessboard();
         this.drawChesses();
     }
     
     this.drawChessboard = function () {
-        
+        let ctx = this.cvsChessboard.getContext('2d');
+        ctx.fillRect(0, 0, 50, 50);
     }
     
     this.drawChesses = function () {
@@ -82,7 +90,7 @@ function ChessGameCanvas(game) {
     {['cvs-chessboard', 'cvs-chesses', 'cvs-feedback'].forEach(function(cvs_name) {
     	let cvs = document.createElement('canvas');
     	cvs.setAttribute('id', `${game.node.id}-${cvs_name}`);
-    	cvs.setAttribute('style', 'position: absolute; width: 100%; height: 100%;');
+    	cvs.setAttribute('style', 'position: absolute;');
     	game.node.appendChild(cvs);
     });}
     this.cvsChessboard = document.getElementById(`${game.node.id}-cvs-chessboard`); 
@@ -91,5 +99,5 @@ function ChessGameCanvas(game) {
     this.updateLength();
     this.draw();
    
-    window.addEventListener('resize', this.updateLength.bind(this));
+    window.addEventListener('resize', this.draw.bind(this));
 }
