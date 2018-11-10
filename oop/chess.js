@@ -1,13 +1,5 @@
 'use strict';
 
-var GAME;
-
-
-// 初始化游戏
-document.addEventListener('DOMContentLoaded', function (event) {
-	GAME = new ChessGame(document.getElementById('chess-game'));
-});
-
 
 // 象棋游戏对象
 function ChessGame(node) {
@@ -45,6 +37,7 @@ function ChessGameCanvas(game) {
 	this.cvsFeedback;     // 反馈画布
 
     this.updateMeasuring; // 更新度量
+    this.canvasLength;    // 画布尺寸
     this.offsetTop;       // 绘图坐标原点距离父元素顶端的偏移
     this.offsetLeft;      // 绘图坐标原点距离父元素左端的偏移
     this.cellLength;      // 单位棋盘格子的长度
@@ -57,37 +50,37 @@ function ChessGameCanvas(game) {
 	this.logicCoordinate2DrawingCoordinate;
 	this.DrawingCoordinate2LogicCoordinate;
     
-    this.updateLength = function () {
+    this.updateMeasuring = function () {
         let parentHeight = game.node.clientHeight;
         let parentWidth = game.node.clientWidth;
-        let availableLength = Math.min(parentHeight, parentWidth);
-        this.cellLengh = availableLength / 11;
-        this.offsetTop = (parentHeight - availableLength) / 2;
-        this.offsetLeft = (parentWidth - availableLength) / 2;
+        this.canvasLength = Math.min(parentHeight, parentWidth);
+        this.cellLengh = this.canvasLength / 11;
+        this.offsetTop = (parentHeight - this.canvasLength) / 2;
+        this.offsetLeft = (parentWidth - this.canvasLength) / 2;
         [this.cvsChessboard, this.cvsChesses, this.cvsFeedback].forEach(function (cvs) {
             cvs.style.top = `${this.offsetTop}px`;
             cvs.style.left = `${this.offsetLeft}px`;
-            cvs.width = `${availableLength}`;
-            cvs.height = `${availableLength}`;
+            cvs.width = `${this.canvasLength}`;
+            cvs.height = `${this.canvasLength}`;
         }.bind(this));
     }
     
     this.draw = function () {
-        this.updateLength();
+        this.updateMeasuring();
         this.drawChessboard();
         this.drawChesses();
     }
     
     this.drawChessboard = function () {
         let ctx = this.cvsChessboard.getContext('2d');
-        ctx.fillRect(0, 0, 50, 50);
+        ctx.strokeRect(0, 0, this.canvasLength, this.canvasLength);
     }
     
     this.drawChesses = function () {
         
     }
     
-    {['cvs-chessboard', 'cvs-chesses', 'cvs-feedback'].forEach(function(cvs_name) {
+    {['cvs-chessboard', 'cvs-chesses', 'cvs-feedback'].forEach(function (cvs_name) {
     	let cvs = document.createElement('canvas');
     	cvs.setAttribute('id', `${game.node.id}-${cvs_name}`);
     	cvs.setAttribute('style', 'position: absolute;');
@@ -96,8 +89,8 @@ function ChessGameCanvas(game) {
     this.cvsChessboard = document.getElementById(`${game.node.id}-cvs-chessboard`); 
     this.cvsChesses = document.getElementById(`${game.node.id}-cvs-chesses`); 
     this.cvsFeedback = document.getElementById(`${game.node.id}-cvs-feedback`);
-    this.updateLength();
-    this.draw();
    
     window.addEventListener('resize', this.draw.bind(this));
+    
+    this.draw();
 }
