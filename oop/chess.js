@@ -119,16 +119,35 @@ function ChessGameCanvas(game) {
           ctx.moveTo(x[i], y[0]);
           ctx.lineTo(x[i], y[1]);
           ctx.stroke();
-      }  
+      }
     }    
     
     // 绘制棋盘上大本营处的斜线
     {
-      [3.5, 5.5];
-      [0.5, 2.5];
+      let head = [
+        [3.5, 0.5], [5.5, 0.5], [3.5, 7.5], [5.5, 7.5]
+      ].map((pair) => pair.map((val) => val * this.cellLength));  // 折线起点
+      let tail = [
+        [5.5, 2.5], [3.5, 2.5], [5.5, 9.5], [3.5, 9.5]
+      ].map((pair) => pair.map((val) => val * this.cellLength));  // 折线终点
+      for (let i = 0; i < 4; ++i) {
+        ctx.beginPath();
+        ctx.moveTo(head[i][0], head[i][1]);
+        ctx.lineTo(tail[i][0], tail[i][1]);
+        ctx.stroke();
+      }
     }
     
     // 绘制棋盘上特殊位置的标记
+    {
+      let place = [
+        [1.5, 2.5], [7.5, 2.5], [0.5, 3.5], [2.5, 3.5], [4.5, 3.5], [6.5, 3.5], [8.5, 3.5],
+        [1.5, 7.5], [7.5, 7.5], [0.5, 6.5], [2.5, 6.5], [4.5, 6.5], [6.5, 6.5], [8.5, 6.5],
+      ].map((pair) => pair.map((val) => val * this.cellLength));  // 特殊位置的坐标
+      for (let i = 0; i < place.length; ++i) {
+        
+      }
+    }
   }
   
   this.drawChesses = function () {
