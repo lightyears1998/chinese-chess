@@ -42,33 +42,57 @@ var blackKing = new Chess("black", "将", 9, 4);
 	blackPawn4 = new Chess("black", "卒", 6, 6);
 	blackPawn5 = new Chess("black", "卒", 6, 8);
 var isClick = false;
-var firstChess;
+var firstChess, firstChessX, firstChessY;
+var turn = 0;  // 偶数表示轮到红棋落子，奇数表示轮到黑棋落子
+var gameOver = false;
+/* var timer = setInterval(function() {
+	isGameOver();
+},1000); */
 $(function(){
 	responsive();     // 响应式设计
 	checkerboard();    // 绘制棋盘
 	init();
 });
-/* var timer = setInterval(function(){  // 设置定时器显示棋子，但没用！
-	changeChess();
-},10); */
 // 实时监听鼠标点击
 window.onmousedown = function(event) {
 	var toLeft = event.clientX - canvas.offsetLeft - paddingX;
 	var toTop = event.clientY - canvas.offsetTop - paddingY;
 	var chessY = Math.round(toLeft / ceilWidth);    // 所点击位置的行列
 	var chessX = Math.round(toTop / ceilHeight);
-	if(isClick === false && mark[chessX][chessY] !== 0) {  // 第一次点击，需要点击棋子
-		firstChess = mark[chessX][chessY];    // 记录点击的棋子
-		isClick = true;        // 标记已有第一次点击
+	if(isClick === false && mark[chessX][chessY] !== 0) {    // 第一次点击，需要点击棋子
+		if(mark[chessX][chessY].group === "black" && turn%2 === 0){     // 错误操作，应该轮到红棋落子
+			alert("轮到红棋落子");
+		}
+		else if(mark[chessX][chessY].group === "red" && turn%2 === 1){  // 错误操作，应该轮到黑棋落子
+			alert("轮到黑棋落子");
+		}
+		else {
+			firstChess = Object.assign(mark[chessX][chessY]);    // 记录点击的棋子
+			firstChessX = chessX;
+			firstChessY = chessY;
+			isClick = true;        // 标记已有第一次点击		
+		}
 	}
-	else if(isClick === true) {  // 第二次点击，不需要点击棋子
-		mark[chessX][chessY] = firstChess;   // 将棋子移动到第二次点击的位置
-		mark[chessX][chessY].x = chessX;
-		mark[chessX][chessY].y = chessY;
-		mark[firstChess.x][firstChess.y] = 0;  // 清除第一次点击的棋子的所在位置
-		changeChess();
-		isClick = false;  
-		console.log(mark);
+	else if(isClick === true) {    	
+		if(mark[chessX][chessY].group === firstChess.group){  // 第二次点击，点击到己方的棋子则无效
+			isClick = false;
+			alert("该位置已经有己方棋子存在了,请重新选择要移动的棋子");
+		}
+		else {    // 第二次点击，点击到空位或对方棋子
+			if(isConformRule(firstChess, firstChess.x, firstChess.y, chessX, chessY)){
+				mark[chessX][chessY] = Object.assign(firstChess);  // 将棋子移动到第二次点击的位置
+				mark[chessX][chessY].x = chessX;
+				mark[chessX][chessY].y = chessY; 
+				mark[firstChessX][firstChessY] = 0;  // 清除第一次点击的棋子的所在位置, 在init函数中mark数组已经是指向棋子对象的引用了！	
+				isClick = false;  
+				turn++;
+				changeChess();
+			}
+			else {
+				isClick = false;
+				alert("棋子移动不符合规则,请重新选择要移动的棋子");
+			}
+		}
 	}
 }
 // 实时监听浏览器宽高变化
@@ -145,10 +169,15 @@ function init() {
 	mark[6][4] = blackPawn3;
 	mark[6][6] = blackPawn4;
 	mark[6][8] = blackPawn5;
+	turn = 0;
+	gameOver = false;
 	changeChess();
 }
 // 根据标记数组绘制棋子
 function changeChess() {
+	context = canvas.getContext("2d");  // 需要重新布置画布才能及时显示棋子，画在canvas上的东西不会凭空产生消失
+	context.clearRect(0, 0, canvasWidth, canvasHeight);
+	checkerboard();
 	 for(var i=0; i<=9; i++){
 		for(var j=0; j<=8; j++){
 			drawChess(mark[i][j]);	
