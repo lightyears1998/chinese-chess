@@ -1,20 +1,21 @@
 'use strict'
 
-var cvs_chessboard, cvs_chesss, cvs_feedback;
-
 // 初始化游戏
 document.addEventListener('DOMContentLoaded', function (event) {
 	createCanvas();
 });
 
+// 顺序层叠3层Canvas
 function createCanvas() {
-	let node_game = document.getElementById('chess-game');
-	cvs_chessboard = document.createElement('canvas');
-	cvs_chesss = document.createElement('canvas');
-	cvs_feedback = document.createElement('canvas');
-	node_game.appendChild(cvs_chessboard);
-	node_game.appendChild(cvs_chesss);
-	node_game.appendChild(cvs_feedback);
+	let node_game = document.getElementById('chess-game-div');
+    if (node_game) {
+        ['cvs-chessboard', 'cvs-chesses', 'cvs-feedback'].forEach(function (cvs_name) {
+            let cvs = document.createElement('canvas');
+            cvs.setAttribute('id', cvs_name);
+            cvs.setAttribute('class', 'chess-game-canvas');
+            node_game.appendChild(cvs);
+        });
+    }
 }
 
 // 棋盘层
