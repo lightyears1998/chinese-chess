@@ -1,45 +1,187 @@
-var context;
-var boxWidth, boxHeight;
+var canvas = document.getElementById("canvas");  // 布置画布
+var context = canvas.getContext("2d");
+var canvasWidth, canvasHeight;  // 画布大小
+var boxHeight, boxWidth;  // 棋盘大小
+var paddingX, paddingY;   // 棋盘距离外框的距离
+var ceilWidth, ceilHeight;  // 格子大小
+var chessSize;   // 棋子大小
+var chessFontSize;  // 棋子文字大小
+var mark = new Array();   // 标记棋盘上该位置是否有棋子
 
-// 计算绘图所需的参数
-function calculateArgs() {
-	// 获取浏览器可使用宽高
+ // 棋子对象
+var redKing = new Chess("red", "帅", 0, 4);
+	redGuard1 = new Chess("red", "士", 0, 3);
+	redGuard2 = new Chess("red", "士", 0, 5);
+	redBishop1 = new Chess("red", "相", 0, 2);
+	redBishop2 = new Chess("red", "相", 0, 6);
+	redKnight1 = new Chess("red", "马", 0, 1);
+	redKnight2 = new Chess("red", "马", 0,7);
+	redRook1 = new Chess("red", "车", 0, 0);
+	redRook2 = new Chess("red", "车", 0, 8);
+	redCannon1 = new Chess("red", "炮", 2, 1);
+	redCannon2 = new Chess("red", "炮", 2, 7);
+	redPawn1 = new Chess("red", "兵", 3, 0);
+	redPawn2 = new Chess("red", "兵", 3, 2);
+	redPawn3 = new Chess("red", "兵", 3, 4);
+	redPawn4 = new Chess("red", "兵", 3, 6);
+	redPawn5 = new Chess("red", "兵", 3, 8);
+var blackKing = new Chess("black", "将", 9, 4);
+	blackGuard1 = new Chess("black", "士", 9, 3);
+	blackGuard2 = new Chess("black", "士", 9, 5);
+	blackBishop1 = new Chess("black", "象", 9, 2);
+	blackBishop2 = new Chess("black", "象", 9, 6);
+	blackKnight1 = new Chess("black", "马", 9, 1);
+	blackKnight2 = new Chess("black", "马", 9,7);
+	blackRook1 = new Chess("black", "车", 9, 0);
+	blackRook2 = new Chess("black", "车", 9, 8);
+	blackCannon1 = new Chess("black", "炮", 7, 1);
+	blackCannon2 = new Chess("black", "炮", 7, 7);
+	blackPawn1 = new Chess("black", "卒", 6, 0);
+	blackPawn2 = new Chess("black", "卒", 6, 2);
+	blackPawn3 = new Chess("black", "卒", 6, 4);
+	blackPawn4 = new Chess("black", "卒", 6, 6);
+	blackPawn5 = new Chess("black", "卒", 6, 8);
+var isClick = false;
+var firstChess, firstChessX, firstChessY;
+var turn = 0;  // 偶数表示轮到红棋落子，奇数表示轮到黑棋落子
+var gameOver = false;
+/* var timer = setInterval(function() {
+	isGameOver();
+},1000); */
+$(function(){
+	responsive();     // 响应式设计
+	checkerboard();    // 绘制棋盘
+	init();
+});
+// 实时监听鼠标点击
+window.onmousedown = function(event) {
+	var toLeft = event.clientX - canvas.offsetLeft - paddingX;
+	var toTop = event.clientY - canvas.offsetTop - paddingY;
+	var chessY = Math.round(toLeft / ceilWidth);    // 所点击位置的行列
+	var chessX = Math.round(toTop / ceilHeight);
+	if(isClick === false && mark[chessX][chessY] !== 0) {    // 第一次点击，需要点击棋子
+		if(mark[chessX][chessY].group === "black" && turn%2 === 0){     // 错误操作，应该轮到红棋落子
+			alert("轮到红棋落子");
+		}
+		else if(mark[chessX][chessY].group === "red" && turn%2 === 1){  // 错误操作，应该轮到黑棋落子
+			alert("轮到黑棋落子");
+		}
+		else {
+			firstChess = Object.assign(mark[chessX][chessY]);    // 记录点击的棋子
+			firstChessX = chessX;
+			firstChessY = chessY;
+			isClick = true;        // 标记已有第一次点击		
+		}
+	}
+	else if(isClick === true) {    	
+		if(mark[chessX][chessY].group === firstChess.group){  // 第二次点击，点击到己方的棋子则无效
+			isClick = false;
+			alert("该位置已经有己方棋子存在了,请重新选择要移动的棋子");
+		}
+		else {    // 第二次点击，点击到空位或对方棋子
+			if(isConformRule(firstChess, firstChess.x, firstChess.y, chessX, chessY)){
+				mark[chessX][chessY] = Object.assign(firstChess);  // 将棋子移动到第二次点击的位置
+				mark[chessX][chessY].x = chessX;
+				mark[chessX][chessY].y = chessY; 
+				mark[firstChessX][firstChessY] = 0;  // 清除第一次点击的棋子的所在位置, 在init函数中mark数组已经是指向棋子对象的引用了！	
+				isClick = false;  
+				turn++;
+				changeChess();
+			}
+			else {
+				isClick = false;
+				alert("棋子移动不符合规则,请重新选择要移动的棋子");
+			}
+		}
+	}
+}
+// 实时监听浏览器宽高变化
+$(window).resize(function() {
+	responsive();
+	checkerboard();
+	changeChess();
+});
+// 棋子的构造函数
+function Chess(group, name, x, y) {
+	this.group = group;
+	this.name= name;
+	this.x = x;
+	this.y = y;
+}
+// 响应式设计
+function responsive() {
+	// 获取浏览器可使用的宽高
 	var browserWidth = window.innerWidth || document.documentElement.clientWidth || document.body.clientWidth;
 	var browserHeight = window.innerHeight || document.documentElement.clientHeight || document.body.clientHeight;
-	// 布置画布
-	var canvas = document.getElementById("canvas");
-	context = canvas.getContext("2d");
-	// 响应式设计宽高
-	var maxLength = Math.min(browserWidth, browserHeight) * 0.8;  // 设定canvas的最大长度为浏览器的宽高中较小值的80% 
-	canvas.height = Math.ceil(maxLength);
-	canvas.width = Math.ceil(maxLength / 9 * 8);
-	boxHeight = canvas.height;
-	boxWidth = canvas.width;
-	
-	/*
-	if(browserWidth / browserHeight >= 1){       // 当前使用电脑，根据高度来设置棋盘宽高
-		canvas.height = ;
-		boxHeight = canvas.height;
-		canvas.width = Math.ceil(boxHeight * 8 / 9);
-		boxWidth = canvas.width;
-	}	
-	else {                       // 当前使用手机，根据宽度来设置棋盘宽高
-		canvas.width = Math.ceil(browserWidth * 8 / 9);
-		boxWidth = canvas.width;
-		canvas.higth = Math.ceil(boxWidth * 9 / 8);
-		boxHeight = canvas.height;
-	}*/
-	
-	$(".box").width(boxWidth).height(boxHeight);
+	// 通过获取浏览器宽高中的较小值来设置棋盘大小
+	var minLength = Math.min(browserWidth, browserHeight) * 0.9;
+	canvas.height = Math.ceil(minLength);
+	canvas.width = Math.ceil(minLength / 9 * 8);
+	canvasWidth = canvas.width;
+	canvasHeight = canvas.height;
+	ceilWidth = canvasWidth / 9;
+	ceilHeight = canvasHeight / 10;
+	paddingX =  ceilWidth / 2;
+	paddingY =  ceilHeight / 2;
+	boxWidth = canvasWidth - paddingX * 2;
+	boxHeight = canvasHeight - paddingY * 2 ;
+	chessSize = Math.ceil(ceilWidth * 0.4);
+	chessFontSize = Math.ceil(chessSize*0.8);
+	$(".box").width(canvasWidth).height(canvasHeight);
+}
+// 初始化mark数组
+function init() {
+	for(var i=0; i<=9; i++){
+		mark[i] = new Array();
+		for(var j=0; j<=8; j++){
+			mark[i][j] = 0;
+		}
+	}
+	mark[0][0] = redRook1;
+	mark[0][1] = redKnight1;
+	mark[0][2] = redBishop1;
+	mark[0][3] = redGuard1;
+	mark[0][4] = redKing;
+	mark[0][5] = redGuard2;
+	mark[0][6] = redBishop2;
+	mark[0][7] = redKnight2;
+	mark[0][8] = redRook2;
+	mark[2][1] = redCannon1;
+	mark[2][7] = redCannon2;
+	mark[3][0] = redPawn1;
+	mark[3][2] = redPawn2;
+	mark[3][4] = redPawn3;
+	mark[3][6] = redPawn4;
+	mark[3][8] = redPawn5;
+	mark[9][0] = blackRook1;
+	mark[9][1] = blackKnight1;
+	mark[9][2] = blackBishop1;
+	mark[9][3] = blackGuard1;
+	mark[9][4] = blackKing;
+	mark[9][5] = blackGuard2;
+	mark[9][6] = blackBishop2;
+	mark[9][7] = blackKnight2;
+	mark[9][8] = blackRook2;
+	mark[7][1] = blackCannon1;
+	mark[7][7] = blackCannon2;
+	mark[6][0] = blackPawn1;
+	mark[6][2] = blackPawn2;
+	mark[6][4] = blackPawn3;
+	mark[6][6] = blackPawn4;
+	mark[6][8] = blackPawn5;
+	turn = 0;
+	gameOver = false;
+	changeChess();
+}
+// 根据标记数组绘制棋子
+function changeChess() {
+	context = canvas.getContext("2d");  // 需要重新布置画布才能及时显示棋子，画在canvas上的东西不会凭空产生消失
+	context.clearRect(0, 0, canvasWidth, canvasHeight);
+	checkerboard();
+	 for(var i=0; i<=9; i++){
+		for(var j=0; j<=8; j++){
+			drawChess(mark[i][j]);	
+		}
+	} 
 }
 
-$(function(){
-	calculateArgs();
-	checkerboard();    // 绘制棋盘
-//	chessPiecesInit();
-
-	$(window).resize(function () {
-		calculateArgs();
-		checkerboard();    // 绘制棋盘
-	});
-});
