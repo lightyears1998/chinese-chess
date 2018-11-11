@@ -12,7 +12,7 @@ function ChessGame(node) {
 
   this.node;     // 游戏在DOM树中的节点
   this.chesses;  // 游戏中的棋子 
-	this.canvas;   // 游戏画布
+  this.canvas;   // 游戏画布
 
   this.init;     // 初始化游戏
 	
@@ -20,11 +20,11 @@ function ChessGame(node) {
   this.pause;    // 暂停游戏
   this.stop;     // 结束游戏
 
-	this.move;     // 移动棋子
-	this.history;  // 行棋历史记录
+  this.move;     // 移动棋子
+  this.history;  // 行棋历史记录
 
-	this.init = function () {
-		this.chesses = [
+  this.init = function () {
+    this.chesses = [
       Chess('車', 0, 0), Chess('馬', 0, 1), Chess('象', 0, 2), Chess('士', 0, 3), 
       Chess('將', 0, 4), Chess('士', 0, 5), Chess('象', 0, 6), Chess('馬', 0, 7), 
       Chess('車', 0, 8), Chess('砲', 2, 1), Chess('砲', 2, 7), Chess('卒', 3, 0), 
@@ -35,7 +35,7 @@ function ChessGame(node) {
       Chess('兵', 6, 2), Chess('兵', 6, 4), Chess('兵', 6, 6), Chess('兵', 6, 8),
     ];
     this.canvas.cvsChesses.dispatchEvent(new Event('chess-update'));
-	}
+  }
 
   this.node = node;
   this.canvas = new ChessGameCanvas(this);
@@ -45,11 +45,11 @@ function ChessGame(node) {
 
 // 棋子对象
 function Chess(rank, x, y) {
-	if (!(this instanceof Chess)) {
-		return new Chess(rank, x, y);
-	}
+  if (!(this instanceof Chess)) {
+    return new Chess(rank, x, y);
+  }
 	
-	this.rank = rank;  // 棋名
+  this.rank = rank;  // 棋名
   this.x = x;
   this.y = y;
   
@@ -64,33 +64,32 @@ function Chess(rank, x, y) {
     }
   }
 	
-	this.listPossibleMove = function () {
+  this.listPossibleMove = function () {
     switch (rank) {
       
     }
-	}
- 
+  }
 }
 
 
 // 棋子移动对象
 function ChessMove() {
-	this.type;  // 移动类型：trivial（平凡）, attck（攻击）
+  this.type;  // 移动类型：trivial（平凡）, attck（攻击）
 }
 
 
 // 游戏对象绑定的画布
 function ChessGameCanvas(game) {
-	if (!(this instanceof ChessGameCanvas)) {
-		return new ChessGameCanvas(game);
-	}
-	if (!(game instanceof ChessGame)) {
+  if (!(this instanceof ChessGameCanvas)) {
+    return new ChessGameCanvas(game);
+  }
+  if (!(game instanceof ChessGame)) {
     throw new Error('人生充满意外，需要放平心态');
-	}
+  }
 
   this.cvsChessboard;     // 棋盘画布
-	this.cvsChesses;        // 棋子画布
-	this.cvsFeedback;       // 反馈画布
+  this.cvsChesses;        // 棋子画布
+  this.cvsFeedback;       // 反馈画布
 
   this.updateMeasuring;   // 更新度量
   this.canvasWidth;       // 画布宽度
@@ -107,8 +106,8 @@ function ChessGameCanvas(game) {
 
   // 像素坐标、逻辑坐标与象棋坐标
   // 棋子逻辑坐标与像素坐标的相互转换
-	this.logicCoordinate2PixelCoordinate;
-	this.PixelCoordinate2LogicCoordinate;
+  this.logicCoordinate2PixelCoordinate;
+  this.PixelCoordinate2LogicCoordinate;
 
   // 计算画布宽高等棋盘参数
   this.updateMeasuring = function () {
