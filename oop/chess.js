@@ -20,31 +20,56 @@ function ChessGame(node) {
 	this.pause;    // 暂停游戏
 	this.stop;     // 结束游戏
 	
-	thus.move;     // 移动棋子
+	this.move;     // 移动棋子
 	this.history;  // 行棋历史记录
 
 	this.init = function () {
-		
+		this.chesses = [
+      Chess('車', 0, 0), Chess('馬', 0, 1), Chess('象', 0, 2), Chess('士', 0, 3), 
+      Chess('將', 0, 4), Chess('士', 0, 5), Chess('象', 0, 6), Chess('馬', 0, 7), 
+      Chess('車', 0, 8), Chess('砲', 2, 1), Chess('砲', 2, 7), Chess('卒', 3, 0), 
+      Chess('卒', 3, 2), Chess('卒', 3, 4), Chess('卒', 3, 6), Chess('卒', 3, 8),
+      Chess('俥', 9, 0), Chess('傌', 9, 1), Chess('相', 9, 2), Chess('仕', 9, 3), 
+      Chess('帥', 9, 4), Chess('仕', 9, 5), Chess('相', 9, 6), Chess('傌', 9, 7), 
+      Chess('俥', 9, 8), Chess('炮', 7, 1), Chess('炮', 7, 7), Chess('兵', 6, 0), 
+      Chess('兵', 6, 2), Chess('兵', 6, 4), Chess('兵', 6, 6), Chess('兵', 6, 8),
+    ];
+    this.canvas.cvsChesses.dispatchEvent(new Event('chess-update'));
 	}
 
   this.node = node;
   this.canvas = new ChessGameCanvas(this);
+  this.init();
 }
 
 
 // 棋子对象
-function Chess(name, rank) {
+function Chess(rank, x, y) {
 	if (!(this instanceof Chess)) {
-		return new Chess(name, rank);
+		return new Chess(rank, x, y);
 	}
 	
-	this.name = name;  // 棋名
-	this.rank = rank;  // 军衔
-	this.camp = camp;  // 阵营
+	this.rank = rank;  // 棋名
+  this.x = x;
+  this.y = y;
+  
+  // 取得棋子的阵营
+  this.getCamp = function () {
+    switch (rank) {
+      case '車': case '馬': case '象': case '士': 
+      case '將': case '砲': case '卒':
+        return 'black';
+      case '':
+        return 'red';
+    }
+  }
 	
-	this.listPossibleMove() {
-
+	this.listPossibleMove = function () {
+    switch (rank) {
+      
+    }
 	}
+ 
 }
 
 
@@ -63,20 +88,22 @@ function ChessGameCanvas(game) {
     throw new Error('人生充满意外，需要放平心态');
 	}
 
-  this.cvsChessboard;   // 棋盘画布
-	this.cvsChesses;      // 棋子画布
-	this.cvsFeedback;     // 反馈画布
+  this.cvsChessboard;     // 棋盘画布
+	this.cvsChesses;        // 棋子画布
+	this.cvsFeedback;       // 反馈画布
 
-  this.updateMeasuring; // 更新度量
-  this.canvasWidth;     // 画布宽度
-  this.canvasHeight;    // 画布高度
-  this.offsetTop;       // 绘图坐标原点距离父元素顶端的偏移
-  this.offsetLeft;      // 绘图坐标原点距离父元素左端的偏移
-  this.cellLength;      // 单位棋盘格子的长度
+  this.updateMeasuring;   // 更新度量
+  this.canvasWidth;       // 画布宽度
+  this.canvasHeight;      // 画布高度
+  this.offsetTop;         // 绘图坐标原点距离父元素顶端的偏移
+  this.offsetLeft;        // 绘图坐标原点距离父元素左端的偏移
+  this.cellLength;        // 单位棋盘格子的长度
 
-  this.draw;            // 绘制游戏
-  this.drawChessboard;  // 绘制棋盘
-  this.drawChesses;     // 绘制棋盘上的棋子
+  this.viewMode = 'red';  // ['red' | 'black'] 棋盘下方的阵营颜色
+
+  this.draw;              // 绘制游戏
+  this.drawChessboard;    // 绘制棋盘
+  this.drawChesses;       // 绘制棋盘上的棋子
 
   // 像素坐标、逻辑坐标与象棋坐标
   // 棋子逻辑坐标与像素坐标的相互转换
@@ -198,8 +225,20 @@ function ChessGameCanvas(game) {
     }
   }
   
+  // 中国象棋棋子
+  // 棋子坐标，规定黑將右手侧車为(0, 0)，棋盘对角线上红方的俥为(9, 8)
+  // 注意棋子坐标以行列记，像素坐标以宽高记，两者序偶的顺序相反
   this.drawChesses = function () {
-
+    // 未实现viewMode
+    let ctx = this.cvsChesses.getContext('2d');
+    for (let idx in game.chesses) {
+      let chess = game.chesses[idx];
+      let x = (chess.x + 0.5) * this.cellLength;
+      let y = (chess.y + 0.5) * this.cellLength;
+      ctx.beginPath();
+      ctx.arc(y, x, 0.4 * this.cellLength, 0, 2 * Math.PI);
+      ctx.stroke();
+    }
   }
 
   {['cvs-chessboard', 'cvs-chesses', 'cvs-feedback'].forEach(function (cvs_name) {
@@ -213,6 +252,7 @@ function ChessGameCanvas(game) {
   this.cvsFeedback = document.getElementById(`${game.node.id}-cvs-feedback`);
 
   window.addEventListener('resize', this.draw.bind(this));
+  this.cvsChesses.addEventListener('chess-update', this.drawChesses.bind(this));
 
   this.draw();
 }
