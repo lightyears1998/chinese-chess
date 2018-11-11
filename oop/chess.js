@@ -10,16 +10,16 @@ function ChessGame(node) {
     throw new Error('人生充满意外，需要放平心态');
   }
 
-	this.node;     // 游戏在DOM树中的节点
-	this.chesses;  // 游戏中的棋子 
+  this.node;     // 游戏在DOM树中的节点
+  this.chesses;  // 游戏中的棋子 
 	this.canvas;   // 游戏画布
 
-	this.init;     // 初始化游戏
+  this.init;     // 初始化游戏
 	
-	this.start;    // 开始游戏
-	this.pause;    // 暂停游戏
-	this.stop;     // 结束游戏
-	
+  this.start;    // 开始游戏
+  this.pause;    // 暂停游戏
+  this.stop;     // 结束游戏
+
 	this.move;     // 移动棋子
 	this.history;  // 行棋历史记录
 
