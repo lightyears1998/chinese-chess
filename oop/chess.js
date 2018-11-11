@@ -10,16 +10,47 @@ function ChessGame(node) {
     throw new Error('人生充满意外，需要放平心态');
   }
 
-	this.node;   // 游戏在DOM树中的节点
-	this.canvas; // 游戏画布
+	this.node;     // 游戏在DOM树中的节点
+	this.chesses;  // 游戏中的棋子 
+	this.canvas;   // 游戏画布
 
-	this.init;   // 初始化游戏
-	this.start;  // 开始游戏
-	this.pause;  // 暂停游戏
-	this.stop;   // 结束游戏
+	this.init;     // 初始化游戏
+	
+	this.start;    // 开始游戏
+	this.pause;    // 暂停游戏
+	this.stop;     // 结束游戏
+	
+	thus.move;     // 移动棋子
+	this.history;  // 行棋历史记录
+
+	this.init = function () {
+		
+	}
 
   this.node = node;
   this.canvas = new ChessGameCanvas(this);
+}
+
+
+// 棋子对象
+function Chess(name, rank) {
+	if (!(this instanceof Chess)) {
+		return new Chess(name, rank);
+	}
+	
+	this.name = name;  // 棋名
+	this.rank = rank;  // 军衔
+	this.camp = camp;  // 阵营
+	
+	this.listPossibleMove() {
+
+	}
+}
+
+
+// 棋子移动对象
+function ChessMove() {
+	this.type;  // 移动类型：trivial（平凡）, attck（攻击）
 }
 
 
@@ -47,6 +78,7 @@ function ChessGameCanvas(game) {
   this.drawChessboard;  // 绘制棋盘
   this.drawChesses;     // 绘制棋盘上的棋子
 
+  // 像素坐标、逻辑坐标与象棋坐标
   // 棋子逻辑坐标与像素坐标的相互转换
 	this.logicCoordinate2PixelCoordinate;
 	this.PixelCoordinate2LogicCoordinate;
@@ -150,9 +182,9 @@ function ChessGameCanvas(game) {
             let center = [place[i][0] + dx, place[i][1] + dy];
             if (center[0] > 0.5 && center[0] < 8.5) {
               let pt = [
-                [center[0] + 8 * dx, center[1]],
+                [center[0] + 4 * dx, center[1]],
                 [center[0], center[1]],
-                [center[0], center[1] + 8 * dy]
+                [center[0], center[1] + 4 * dy]
               ].map((pair) => pair.map((val) => val * this.cellLength));
               ctx.beginPath();
               ctx.moveTo(pt[0][0], pt[0][1]);
