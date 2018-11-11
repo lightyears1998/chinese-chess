@@ -1,8 +1,6 @@
 // 绘制棋盘
-function checkerboard() {	// 画线
-	drawCheckerboard();     // 画棋盘
-	//drawChess(4, 9);            // 画棋子
-	//drawChess(3, 9);
+function checkerboard() {	
+	drawCheckerboard();     
 }
 // 画线
 function cross(sx, sy, ex, ey, bw) {

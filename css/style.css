@@ -1,6 +1,23 @@
+body{
+	margin: 0;
+	padding: 0;
+}
+a{
+	text-decoration: none;
+	color: rgb(233, 221, 182);
+}
  .box{
 	display: block;
-	/* position: relative; */
 	margin: 30px auto;
-	/* border: 1px solid blue; */
 } 
+ .new{
+	position: relative;
+	float: left;
+    width: 120px;
+    height: 50px;
+    text-align: center;
+    line-height: 50px;
+    font-size: 20px;
+	border-radius: 10px;
+	background-color: rgb(221, 200, 113);
+}

@@ -1,6 +1,5 @@
 // 判断棋子移动是否符合规则
 function isConformRule(chess, sx, sy, ex, ey) {
-	//console.log(sx + " " + sy + " " + ex + " " + ey);
 	switch(chess.name){
 		case "车": 
 			if(rookRule(sx, sy, ex, ey))  return true;
@@ -133,6 +132,17 @@ function guard(sx, sy, ex, ey) {
 }
 // 将和帅的行走规则
 function kingRule(sx, sy, ex, ey) {
+	// 将帅狭路相逢直取中军
+	if(sy === ey && ((mark[sx][sy].name === "帅" && mark[ex][ey].name === "将") || (mark[sx][sy].name === "将" && mark[ex][ey].name === "帅")))
+	{
+		for(var i=Math.min(sx, ex)+1; i<Math.max(sx, ex); i++){
+			console.log(mark[i][sy])
+			if(mark[i][sy] !== 0)  return false;  
+		}
+		if(mark[sx][sy].name === "将") alert("黑棋胜");
+		else if(mark[sx][sy].name === "帅")  alert("红棋胜");
+		return true;
+	}
 	// 不能离开大本营
 	if(mark[sx][sy].group === "red") {
 		if(ey < 3 || ey > 5 || ex > 2)  return false;
@@ -156,23 +166,3 @@ function pawnRule(sx, sy, ex, ey) {
 	// 只能一步步走方格
 	if((Math.abs(sx - ex) === 1 && Math.abs(sy - ey) === 0) || (Math.abs(sx - ex) === 0 && Math.abs(sy - ey) === 1))  return true;
 }
-// 判断游戏是否结束
-/* function isGameOver() {
-	var space = 0;
-	// 将帅狭路相逢先发制人
-	for(var j=3; j<=5; j++){
-		for(var i=0; i<=9; i++){
-			if(mark[i][j] === 0)   space++;
-		}
-		if(gameOver === true) {
-			if(turn % 2 === 0){
-				alert("红棋fail");
-				break;
-			}
-			if(turn % 2 === 1){
-				alert("黑棋fail");
-				break;
-			}
-		}
-	}
-} */

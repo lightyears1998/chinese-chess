@@ -7,7 +7,6 @@ var ceilWidth, ceilHeight;  // 格子大小
 var chessSize;   // 棋子大小
 var chessFontSize;  // 棋子文字大小
 var mark = new Array();   // 标记棋盘上该位置是否有棋子
-
  // 棋子对象
 var redKing = new Chess("red", "帅", 0, 4);
 	redGuard1 = new Chess("red", "士", 0, 3);
@@ -44,10 +43,6 @@ var blackKing = new Chess("black", "将", 9, 4);
 var isClick = false;
 var firstChess, firstChessX, firstChessY;
 var turn = 0;  // 偶数表示轮到红棋落子，奇数表示轮到黑棋落子
-var gameOver = false;
-/* var timer = setInterval(function() {
-	isGameOver();
-},1000); */
 $(function(){
 	responsive();     // 响应式设计
 	checkerboard();    // 绘制棋盘
@@ -59,42 +54,59 @@ window.onmousedown = function(event) {
 	var toTop = event.clientY - canvas.offsetTop - paddingY;
 	var chessY = Math.round(toLeft / ceilWidth);    // 所点击位置的行列
 	var chessX = Math.round(toTop / ceilHeight);
-	if(isClick === false && mark[chessX][chessY] !== 0) {    // 第一次点击，需要点击棋子
-		if(mark[chessX][chessY].group === "black" && turn%2 === 0){     // 错误操作，应该轮到红棋落子
-			alert("轮到红棋落子");
-		}
-		else if(mark[chessX][chessY].group === "red" && turn%2 === 1){  // 错误操作，应该轮到黑棋落子
-			alert("轮到黑棋落子");
-		}
-		else {
-			firstChess = Object.assign(mark[chessX][chessY]);    // 记录点击的棋子
-			firstChessX = chessX;
-			firstChessY = chessY;
-			isClick = true;        // 标记已有第一次点击		
-		}
-	}
-	else if(isClick === true) {    	
-		if(mark[chessX][chessY].group === firstChess.group){  // 第二次点击，点击到己方的棋子则无效
-			isClick = false;
-			alert("该位置已经有己方棋子存在了,请重新选择要移动的棋子");
-		}
-		else {    // 第二次点击，点击到空位或对方棋子
-			if(isConformRule(firstChess, firstChess.x, firstChess.y, chessX, chessY)){
-				mark[chessX][chessY] = Object.assign(firstChess);  // 将棋子移动到第二次点击的位置
-				mark[chessX][chessY].x = chessX;
-				mark[chessX][chessY].y = chessY; 
-				mark[firstChessX][firstChessY] = 0;  // 清除第一次点击的棋子的所在位置, 在init函数中mark数组已经是指向棋子对象的引用了！	
-				isClick = false;  
-				turn++;
-				changeChess();
+	// console.log(chessX + " " + chessY);
+	if(chessY >= 0 && chessY <= 8 && chessX >= 0 && chessX <= 9)    // 点击范围需要在棋盘中
+	{
+		// console.log(chessX + " " + chessY);
+		if(isClick === false && mark[chessX][chessY] !== 0) {    // 第一次点击，需要点击棋子
+			if(mark[chessX][chessY].group === "black" && turn%2 === 0){     // 错误操作，应该轮到红棋落子
+				alert("轮到红棋落子");
+			}
+			else if(mark[chessX][chessY].group === "red" && turn%2 === 1){  // 错误操作，应该轮到黑棋落子
+				alert("轮到黑棋落子");
 			}
 			else {
+				firstChess = Object.assign(mark[chessX][chessY]);    // 记录点击的棋子
+				firstChessX = chessX;
+				firstChessY = chessY;
+				isClick = true;        // 标记已有第一次点击		
+			}
+		}
+		else if(isClick === true) {    	
+			if(mark[chessX][chessY].group === firstChess.group){  // 第二次点击，点击到己方的棋子则无效
 				isClick = false;
-				alert("棋子移动不符合规则,请重新选择要移动的棋子");
+				alert("该位置已经有己方棋子存在了,请重新选择要移动的棋子");
+			}
+			else {    // 第二次点击，点击到空位或对方棋子
+				if(isConformRule(firstChess, firstChess.x, firstChess.y, chessX, chessY)){
+					// console.log(mark[chessX][chessY]);
+					if(mark[chessX][chessY].name === "将") {
+						alert("红棋胜");
+					}
+					else if(mark[chessX][chessY].name === "帅") {
+						alert("黑棋胜");
+					}
+					mark[chessX][chessY] = Object.assign(firstChess);  // 将棋子移动到第二次点击的位置
+					mark[chessX][chessY].x = chessX;
+					mark[chessX][chessY].y = chessY; 
+					mark[firstChessX][firstChessY] = 0;  // 清除第一次点击的棋子的所在位置, 在init函数中mark数组已经是指向棋子对象的引用了！	
+					isClick = false;  
+					turn++;
+					changeChess();	// 重新绘制棋子位置
+					playAudio();  // 播放下棋音效
+				}
+				else {
+					isClick = false;
+					alert("棋子移动不符合规则,请重新选择要移动的棋子");
+				}
 			}
 		}
 	}
 }
+function playAudio(){
+	var audio= document.getElementById("audio");
+    audio.play();
+} 
 // 实时监听浏览器宽高变化
 $(window).resize(function() {
 	responsive();
@@ -127,7 +139,16 @@ function responsive() {
 	boxHeight = canvasHeight - paddingY * 2 ;
 	chessSize = Math.ceil(ceilWidth * 0.4);
 	chessFontSize = Math.ceil(chessSize*0.8);
+//	var boxToLeft = (browserWidth - canvasWidth) * 0.3;
 	$(".box").width(canvasWidth).height(canvasHeight);
+//	$(".box").css("margin-top", "30px");
+//	$(".box").css("margin-left", boxToLeft);
+/* 	var chatWindowWidth = (browserWidth - canvasWidth) * 0.4;
+	var chatWindowToLeft = canvasWidth * 1.1 ;
+	$(".chatWindow").width(chatWindowWidth).height(canvasHeight);
+	$(".chatWindow").css("margin-top", "30px");
+	$(".chatWindow").css("margin-left", chatWindowToLeft); */
+	
 }
 // 初始化mark数组
 function init() {
@@ -137,6 +158,38 @@ function init() {
 			mark[i][j] = 0;
 		}
 	}
+	redKing = new Chess("red", "帅", 0, 4);
+	redGuard1 = new Chess("red", "士", 0, 3);
+	redGuard2 = new Chess("red", "士", 0, 5);
+	redBishop1 = new Chess("red", "相", 0, 2);
+	redBishop2 = new Chess("red", "相", 0, 6);
+	redKnight1 = new Chess("red", "马", 0, 1);
+	redKnight2 = new Chess("red", "马", 0,7);
+	redRook1 = new Chess("red", "车", 0, 0);
+	redRook2 = new Chess("red", "车", 0, 8);
+	redCannon1 = new Chess("red", "炮", 2, 1);
+	redCannon2 = new Chess("red", "炮", 2, 7);
+	redPawn1 = new Chess("red", "兵", 3, 0);
+	redPawn2 = new Chess("red", "兵", 3, 2);
+	redPawn3 = new Chess("red", "兵", 3, 4);
+	redPawn4 = new Chess("red", "兵", 3, 6);
+	redPawn5 = new Chess("red", "兵", 3, 8);
+	blackKing = new Chess("black", "将", 9, 4);
+	blackGuard1 = new Chess("black", "士", 9, 3);
+	blackGuard2 = new Chess("black", "士", 9, 5);
+	blackBishop1 = new Chess("black", "象", 9, 2);
+	blackBishop2 = new Chess("black", "象", 9, 6);
+	blackKnight1 = new Chess("black", "马", 9, 1);
+	blackKnight2 = new Chess("black", "马", 9,7);
+	blackRook1 = new Chess("black", "车", 9, 0);
+	blackRook2 = new Chess("black", "车", 9, 8);
+	blackCannon1 = new Chess("black", "炮", 7, 1);
+	blackCannon2 = new Chess("black", "炮", 7, 7);
+	blackPawn1 = new Chess("black", "卒", 6, 0);
+	blackPawn2 = new Chess("black", "卒", 6, 2);
+	blackPawn3 = new Chess("black", "卒", 6, 4);
+	blackPawn4 = new Chess("black", "卒", 6, 6);
+	blackPawn5 = new Chess("black", "卒", 6, 8);
 	mark[0][0] = redRook1;
 	mark[0][1] = redKnight1;
 	mark[0][2] = redBishop1;
@@ -170,7 +223,6 @@ function init() {
 	mark[6][6] = blackPawn4;
 	mark[6][8] = blackPawn5;
 	turn = 0;
-	gameOver = false;
 	changeChess();
 }
 // 根据标记数组绘制棋子
@@ -184,4 +236,3 @@ function changeChess() {
 		}
 	} 
 }
-
