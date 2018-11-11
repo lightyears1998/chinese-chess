@@ -47,9 +47,9 @@ function ChessGameCanvas(game) {
   this.drawChessboard;  // 绘制棋盘
   this.drawChesses;     // 绘制棋盘上的棋子
 
-  // 棋子逻辑坐标与绘图坐标的相互转换
-	this.logicCoordinate2DrawingCoordinate;
-	this.DrawingCoordinate2LogicCoordinate;
+  // 棋子逻辑坐标与像素坐标的相互转换
+	this.logicCoordinate2PixelCoordinate;
+	this.PixelCoordinate2LogicCoordinate;
 
   // 计算画布宽高等棋盘参数
   this.updateMeasuring = function () {
@@ -126,10 +126,10 @@ function ChessGameCanvas(game) {
     {
       let head = [
         [3.5, 0.5], [5.5, 0.5], [3.5, 7.5], [5.5, 7.5]
-      ].map((pair) => pair.map((val) => val * this.cellLength));  // 折线起点
+      ].map((pair) => pair.map((val) => val * this.cellLength));  // 折线起点的像素坐标
       let tail = [
         [5.5, 2.5], [3.5, 2.5], [5.5, 9.5], [3.5, 9.5]
-      ].map((pair) => pair.map((val) => val * this.cellLength));  // 折线终点
+      ].map((pair) => pair.map((val) => val * this.cellLength));  // 折线终点的像素坐标
       for (let i = 0; i < 4; ++i) {
         ctx.beginPath();
         ctx.moveTo(head[i][0], head[i][1]);
@@ -143,9 +143,25 @@ function ChessGameCanvas(game) {
       let place = [
         [1.5, 2.5], [7.5, 2.5], [0.5, 3.5], [2.5, 3.5], [4.5, 3.5], [6.5, 3.5], [8.5, 3.5],
         [1.5, 7.5], [7.5, 7.5], [0.5, 6.5], [2.5, 6.5], [4.5, 6.5], [6.5, 6.5], [8.5, 6.5],
-      ].map((pair) => pair.map((val) => val * this.cellLength));  // 特殊位置的坐标
+      ];  // 特殊位置的逻辑坐标
       for (let i = 0; i < place.length; ++i) {
-        
+        for (let dx = -1/16; dx <= 1/16; dx += 1/8) {
+          for (let dy = -1/16; dy <= 1/16; dy += 1/8) {
+            let center = [place[i][0] + dx, place[i][1] + dy];
+            if (center[0] > 0.5 && center[0] < 8.5) {
+              let pt = [
+                [center[0] + 8 * dx, center[1]],
+                [center[0], center[1]],
+                [center[0], center[1] + 8 * dy]
+              ].map((pair) => pair.map((val) => val * this.cellLength));
+              ctx.beginPath();
+              ctx.moveTo(pt[0][0], pt[0][1]);
+              ctx.lineTo(pt[1][0], pt[1][1]);
+              ctx.lineTo(pt[2][0], pt[2][1]);
+              ctx.stroke();
+            }
+          }
+        }
       }
     }
   }
