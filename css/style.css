@@ -2,22 +2,28 @@ body{
 	margin: 0;
 	padding: 0;
 }
+.room{
+	/* display: line-block; */
+	position: relative;
+	margin: 5px 10px;
+}
 a{
 	text-decoration: none;
 	color: rgb(233, 221, 182);
 }
- .box{
+.box{
 	display: block;
-	margin: 30px auto;
+	margin: 0 auto;
 } 
- .new{
+.new{
 	position: relative;
 	float: left;
+	margin-left: 10px;
     width: 120px;
-    height: 50px;
+    height: 40px;
     text-align: center;
-    line-height: 50px;
-    font-size: 20px;
+    line-height: 40px;
+    font-size: 18px;
 	border-radius: 10px;
 	background-color: rgb(221, 200, 113);
 }

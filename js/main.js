@@ -43,10 +43,12 @@ var blackKing = new Chess("black", "将", 9, 4);
 var isClick = false;
 var firstChess, firstChessX, firstChessY;
 var turn = 0;  // 偶数表示轮到红棋落子，奇数表示轮到黑棋落子
+var room;
 $(function(){
 	responsive();     // 响应式设计
 	checkerboard();    // 绘制棋盘
 	init();
+	
 });
 // 实时监听鼠标点击
 window.onmousedown = function(event) {
@@ -81,10 +83,10 @@ window.onmousedown = function(event) {
 				if(isConformRule(firstChess, firstChess.x, firstChess.y, chessX, chessY)){
 					// console.log(mark[chessX][chessY]);
 					if(mark[chessX][chessY].name === "将") {
-						alert("红棋胜");
+						alert("红棋胜！" + "\n" + "双方共行了" + turn + "步棋。");
 					}
 					else if(mark[chessX][chessY].name === "帅") {
-						alert("黑棋胜");
+						alert("黑棋胜！" + "\n" + "双方共行了" + turn + "步棋。");
 					}
 					mark[chessX][chessY] = Object.assign(firstChess);  // 将棋子移动到第二次点击的位置
 					mark[chessX][chessY].x = chessX;
@@ -92,6 +94,7 @@ window.onmousedown = function(event) {
 					mark[firstChessX][firstChessY] = 0;  // 清除第一次点击的棋子的所在位置, 在init函数中mark数组已经是指向棋子对象的引用了！	
 					isClick = false;  
 					turn++;
+					send();  // 向服务器传递棋盘变化数据
 					changeChess();	// 重新绘制棋子位置
 					playAudio();  // 播放下棋音效
 				}
@@ -103,6 +106,7 @@ window.onmousedown = function(event) {
 		}
 	}
 }
+// 播放下棋的音效
 function playAudio(){
 	var audio= document.getElementById("audio");
     audio.play();
@@ -139,16 +143,7 @@ function responsive() {
 	boxHeight = canvasHeight - paddingY * 2 ;
 	chessSize = Math.ceil(ceilWidth * 0.4);
 	chessFontSize = Math.ceil(chessSize*0.8);
-//	var boxToLeft = (browserWidth - canvasWidth) * 0.3;
 	$(".box").width(canvasWidth).height(canvasHeight);
-//	$(".box").css("margin-top", "30px");
-//	$(".box").css("margin-left", boxToLeft);
-/* 	var chatWindowWidth = (browserWidth - canvasWidth) * 0.4;
-	var chatWindowToLeft = canvasWidth * 1.1 ;
-	$(".chatWindow").width(chatWindowWidth).height(canvasHeight);
-	$(".chatWindow").css("margin-top", "30px");
-	$(".chatWindow").css("margin-left", chatWindowToLeft); */
-	
 }
 // 初始化mark数组
 function init() {
@@ -236,3 +231,42 @@ function changeChess() {
 		}
 	} 
 }
+// 确定进入房间
+$("#btn").click(function(){
+	room = $("#roomId").val();
+});
+// 向服务器传递棋盘变化数据
+function send() {
+	$.ajax({
+		type: "post",
+		url : "update.php",
+		data: {
+			action: "send",
+			roomId: room,
+			arr: JSON.stringify(mark)
+		}
+	});
+}
+// 从服务器获取棋盘变化数据
+function get() {
+	$.ajax({
+		type: "post",
+		url: "update.php",
+		data: {
+			action: "get",
+			roomId: room
+		},
+		success: function(request) {
+			request = JSON.parse(request);
+			mark = request.slice();
+		//	console.log(request);
+		//  console.log(mark);
+		//	console.log(typeof request);
+			changeChess();
+		},
+		error: function(request) {
+			alert(request.status);
+		}
+	});
+}
+$(setInterval(get, 1000));
