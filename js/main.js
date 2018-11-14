@@ -93,7 +93,7 @@ window.onmousedown = function(event) {
 					mark[chessX][chessY].y = chessY; 
 					mark[firstChessX][firstChessY] = 0;  // 清除第一次点击的棋子的所在位置, 在init函数中mark数组已经是指向棋子对象的引用了！	
 					isClick = false;  
-					turn++;
+				//	turn++;
 					send();  // 向服务器传递棋盘变化数据
 					changeChess();	// 重新绘制棋子位置
 					playAudio();  // 播放下棋音效
@@ -257,10 +257,24 @@ function get() {
 			roomId: room
 		},
 		success: function(request) {
+			if(mark.toString() !== request){
+				turn++;
+			};
+		//	console.log(mark.toString() !== request);
+		//console.log(mark.toString());
+	//	console.log(request.toString());  // 输出为空
+		//console.log(request);   // 输出为空
+		//console.log( JSON.parse(request));  
+		
+			
 			request = JSON.parse(request);
+			/* if(mark !== request.slice()){
+				turn++;
+			}; */
 			mark = request.slice();
+			console.log(turn);
 		//	console.log(request);
-		//  console.log(mark);
+		 // console.log(mark);
 		//	console.log(typeof request);
 			changeChess();
 		},
