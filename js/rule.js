@@ -139,8 +139,6 @@ function kingRule(sx, sy, ex, ey) {
 			console.log(mark[i][sy])
 			if(mark[i][sy] !== 0)  return false;  
 		}
-		if(mark[sx][sy].name === "将") alert("黑棋胜");
-		else if(mark[sx][sy].name === "帅")  alert("红棋胜");
 		return true;
 	}
 	// 不能离开大本营

@@ -81,10 +81,10 @@ window.onmousedown = function(event) {
 				if(isConformRule(firstChess, firstChess.x, firstChess.y, chessX, chessY)){
 					// console.log(mark[chessX][chessY]);
 					if(mark[chessX][chessY].name === "将") {
-						alert("红棋胜");
+						alert("红棋胜！" + "\n" + "双方共行了" + turn + "步棋。");
 					}
 					else if(mark[chessX][chessY].name === "帅") {
-						alert("黑棋胜");
+						alert("黑棋胜！" + "\n" + "双方共行了" + turn + "步棋。");
 					}
 					mark[chessX][chessY] = Object.assign(firstChess);  // 将棋子移动到第二次点击的位置
 					mark[chessX][chessY].x = chessX;
@@ -92,6 +92,7 @@ window.onmousedown = function(event) {
 					mark[firstChessX][firstChessY] = 0;  // 清除第一次点击的棋子的所在位置, 在init函数中mark数组已经是指向棋子对象的引用了！	
 					isClick = false;  
 					turn++;
+					send();  // 向服务器传递棋盘变化数据
 					changeChess();	// 重新绘制棋子位置
 					playAudio();  // 播放下棋音效
 				}
@@ -103,6 +104,7 @@ window.onmousedown = function(event) {
 		}
 	}
 }
+// 播放下棋的音效
 function playAudio(){
 	var audio= document.getElementById("audio");
     audio.play();
@@ -236,3 +238,32 @@ function changeChess() {
 		}
 	} 
 }
+// 向服务器传递棋盘变化数据
+function send() {
+	$.ajax({
+		type: "post",
+		url : "update.php",
+		data: {
+			action: "send",
+			roomId: $("#room").val(),
+			arr: mark
+		}
+	});
+}
+// 从服务器获取棋盘变化数据
+function get() {
+	$.ajax({
+		type: "post",
+		url: "update.php",
+		data: {
+			action: "get"
+		},
+		success: function(request) {
+			alert(request);
+		},
+		error: function(request) {
+			alert(request.status);
+		}
+	});
+}
+$(setInterval(get, 1000));
