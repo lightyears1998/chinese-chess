@@ -59,7 +59,8 @@ function Chess(rank, x, y) {
       case '車': case '馬': case '象': case '士': 
       case '將': case '砲': case '卒':
         return 'black';
-      case '':
+      case '俥': case '傌': case '相': case '仕': 
+      case '帥': case '炮': case '兵':
         return 'red';
     }
   }
