@@ -235,6 +235,7 @@ function changeChess() {
 // 确定进入房间
 $("#btn").click(function(){
 	room = $("#roomId").val();
+	get();
 });
 
 // 向服务器传递棋盘变化数据
@@ -245,7 +246,10 @@ function send() {
 		data: {
 			action: "send",
 			roomId: room,
-			arr: JSON.stringify(mark)
+			arr: JSON.stringify({
+				mark: mark,
+				turn, turn
+			}) 
 		}
 	});
 }
@@ -259,15 +263,11 @@ function get() {
 			roomId: room
 		},
 		success: function(response) {
-			console.log(response);
 			if (response) {
-				if(JSON.stringify(mark) !== response){
-					turn++;
-				};
-				
-				response = JSON.parse(response);
-				mark = response.slice();
-				console.log(turn);
+				console.log(response);
+				let group = JSON.parse(response);
+				turn = group.turn;
+				mark = group.mark;
 				changeChess();
 			}
 		},
