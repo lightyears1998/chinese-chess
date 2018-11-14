@@ -9,4 +9,3 @@
 		    print(file_get_contents($file));
 		}
 	}
-	

@@ -231,10 +231,12 @@ function changeChess() {
 		}
 	} 
 }
+
 // 确定进入房间
 $("#btn").click(function(){
 	room = $("#roomId").val();
 });
+
 // 向服务器传递棋盘变化数据
 function send() {
 	$.ajax({
