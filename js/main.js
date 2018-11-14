@@ -43,10 +43,12 @@ var blackKing = new Chess("black", "将", 9, 4);
 var isClick = false;
 var firstChess, firstChessX, firstChessY;
 var turn = 0;  // 偶数表示轮到红棋落子，奇数表示轮到黑棋落子
+var room;
 $(function(){
 	responsive();     // 响应式设计
 	checkerboard();    // 绘制棋盘
 	init();
+	
 });
 // 实时监听鼠标点击
 window.onmousedown = function(event) {
@@ -141,16 +143,7 @@ function responsive() {
 	boxHeight = canvasHeight - paddingY * 2 ;
 	chessSize = Math.ceil(ceilWidth * 0.4);
 	chessFontSize = Math.ceil(chessSize*0.8);
-//	var boxToLeft = (browserWidth - canvasWidth) * 0.3;
 	$(".box").width(canvasWidth).height(canvasHeight);
-//	$(".box").css("margin-top", "30px");
-//	$(".box").css("margin-left", boxToLeft);
-/* 	var chatWindowWidth = (browserWidth - canvasWidth) * 0.4;
-	var chatWindowToLeft = canvasWidth * 1.1 ;
-	$(".chatWindow").width(chatWindowWidth).height(canvasHeight);
-	$(".chatWindow").css("margin-top", "30px");
-	$(".chatWindow").css("margin-left", chatWindowToLeft); */
-	
 }
 // 初始化mark数组
 function init() {
@@ -238,6 +231,12 @@ function changeChess() {
 		}
 	} 
 }
+
+// 确定进入房间
+$("#btn").click(function(){
+	room = $("#roomId").val();
+});
+
 // 向服务器传递棋盘变化数据
 function send() {
 	$.ajax({
@@ -245,8 +244,8 @@ function send() {
 		url : "update.php",
 		data: {
 			action: "send",
-			roomId: $("#room").val(),
-			arr: mark
+			roomId: room,
+			arr: JSON.stringify(mark)
 		}
 	});
 }
@@ -256,10 +255,16 @@ function get() {
 		type: "post",
 		url: "update.php",
 		data: {
-			action: "get"
+			action: "get",
+			roomId: room
 		},
 		success: function(request) {
-			alert(request);
+			request = JSON.parse(request);
+			mark = request.slice();
+		//	console.log(request);
+		//  console.log(mark);
+		//	console.log(typeof request);
+			changeChess();
 		},
 		error: function(request) {
 			alert(request.status);
