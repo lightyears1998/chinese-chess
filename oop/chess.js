@@ -19,12 +19,15 @@ function ChessGame(node) {
 
   this.isOngoing;  // 指示游戏是否正在进行
 
-  this.init;     // 初始化游戏
-  this.stop;     // 停止游戏
+  this.init;               // 初始化游戏
+  this.start;              // 指定玩家后开始游戏
+  this.startSelfPractice;  // 开始自我对局
+  this.finish;             // 结束游戏
 
-  this.checkThreat;  // 检查某方的将是否正在受到攻击
+  this.checkThreat;  // 检查某方的主将是否正在受到攻击
 
-  this.move;     // 移动棋子
+  this.onPlayerAction;     // 处理棋手的移动
+  
   this.history;  // 行棋历史记录
 
   this.init = function () {
@@ -41,11 +44,26 @@ function ChessGame(node) {
     this.canvas.cvsChesses.dispatchEvent(new Event('chess-update'));
   }
 
+  this.start = function (playerRed, playerBlack) { 
+    this.playerBlack = playerBlack;
+    this.playerRed = playerRed;
+  }
+
+  this.startSelfPractice = function () {
+    let user = new LocalPlayer(this);
+    this.start(user, user);
+  }
+
   this.move = function () {
     
   }
 
+  this.onPlayerAction = function (event) {
+    
+  }
+
   this.node = node;
+  this.node.addEventListener('player-action', this.onPlayerAction.bind(this));
   this.canvas = new ChessGameCanvas(this);
   this.init();
 }
@@ -58,7 +76,7 @@ function Chess(rank, x, y) {
   }
   
   this.rank = rank;  // 棋名
-  this.x = x;
+  this.x = x;        // 棋子的逻辑坐标
   this.y = y;
   
   // 取得棋子的阵营
@@ -78,6 +96,17 @@ function Chess(rank, x, y) {
       
     }
   }
+}
+
+
+// 棋盘上可以容纳棋子的空位
+function IdlePlace(x, y) {
+  if (!(this instanceof IdlePlace)) {
+    return new IdlePlace(x, y);
+  }
+  
+  this.x = x;  // 空位的逻辑坐标
+  this.y = y; 
 }
 
 
@@ -305,6 +334,21 @@ function ChessGameCanvas(game) {
     }
   }
 
+  // 获取对应客户坐标中的棋子或空位
+  this.getChessOrIdlePlace = function (clientX, clientY) {
+    let x = Math.floor((clientY - this.offsetTop) / this.cellLength);
+    let y = Math.floor((clientX - this.offsetLeft) / this.cellLength);
+    for (let idx in game.chesses) {
+      let chess = game.chesses[idx];
+      if (chess.x == x && chess.y == y) {
+        return chess;
+      }
+    }
+    return new IdlePlace(x, y);
+  }
+
+  
+  // 在DOM中添加画布
   {['cvs-chessboard', 'cvs-chesses', 'cvs-feedback'].forEach(function (cvs_name) {
     let cvs = document.createElement('canvas');
     cvs.setAttribute('id', `${game.node.id}-${cvs_name}`);
