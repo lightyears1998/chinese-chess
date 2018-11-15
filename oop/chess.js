@@ -14,6 +14,12 @@ function ChessGame(node) {
   this.chesses;  // 游戏中的棋子 
   this.canvas;   // 游戏画布
 
+  // 更新棋子并触发棋子层重绘
+  this.updateChesses = function (chesses) {
+    this.chesses = chesses;
+    this.canvas.cvsChesses.dispatchEvent(new Event('chess-update'));
+  }
+
   this.init;     // 初始化游戏
 	
   this.start;    // 开始游戏
@@ -24,7 +30,7 @@ function ChessGame(node) {
   this.history;  // 行棋历史记录
 
   this.init = function () {
-    this.chesses = [
+    this.updateChesses([
       Chess('車', 0, 0), Chess('馬', 0, 1), Chess('象', 0, 2), Chess('士', 0, 3), 
       Chess('將', 0, 4), Chess('士', 0, 5), Chess('象', 0, 6), Chess('馬', 0, 7), 
       Chess('車', 0, 8), Chess('砲', 2, 1), Chess('砲', 2, 7), Chess('卒', 3, 0), 
@@ -33,8 +39,7 @@ function ChessGame(node) {
       Chess('帥', 9, 4), Chess('仕', 9, 5), Chess('相', 9, 6), Chess('傌', 9, 7), 
       Chess('俥', 9, 8), Chess('炮', 7, 1), Chess('炮', 7, 7), Chess('兵', 6, 0), 
       Chess('兵', 6, 2), Chess('兵', 6, 4), Chess('兵', 6, 6), Chess('兵', 6, 8),
-    ];
-    this.canvas.cvsChesses.dispatchEvent(new Event('chess-update'));
+    ]);
   }
 
   this.node = node;
@@ -55,7 +60,7 @@ function Chess(rank, x, y) {
   
   // 取得棋子的阵营
   this.getCamp = function () {
-    switch (rank) {
+    switch (this.rank) {
       case '車': case '馬': case '象': case '士': 
       case '將': case '砲': case '卒':
         return 'black';
@@ -233,15 +238,45 @@ function ChessGameCanvas(game) {
   // 棋子坐标，规定黑將右手侧車为(0, 0)，棋盘对角线上红方的俥为(9, 8)
   // 注意棋子坐标以行列记，像素坐标以宽高记，两者序偶的顺序相反
   this.drawChesses = function () {
-    // 未实现viewMode
     let ctx = this.cvsChesses.getContext('2d');
     for (let idx in game.chesses) {
+      ctx.save();
+      
       let chess = game.chesses[idx];
+      let camp = chess.getCamp();
+      
       let x = (chess.x + 0.5) * this.cellLength;
       let y = (chess.y + 0.5) * this.cellLength;
+      
+      ctx.translate(y, x);
+      if (camp !== this.viewMode) {
+        ctx.rotate(Math.PI);
+      }
+      
+      switch (camp) {
+        case 'red': {
+          ctx.fillStyle = 'red';
+          break;
+        }
+        case 'balck': {
+          ctx.fillStyle = 'balck';
+          break;
+        }
+      }
+      
+      // 绘制棋子边框
       ctx.beginPath();
-      ctx.arc(y, x, 0.4 * this.cellLength, 0, 2 * Math.PI);
+      let radius = 0.4 * this.cellLength;
+      ctx.arc(0, 0, radius, 0, 2 * Math.PI);
       ctx.stroke();
+      
+      // 绘制棋子等级 
+      ctx.font = `${radius * 1.8}px KaiTi`
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      ctx.fillText(chess.rank, 0, 0);
+    
+      ctx.restore();
     }
   }
 
