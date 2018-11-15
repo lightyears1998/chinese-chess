@@ -88,6 +88,10 @@ function ChessGameCanvas(game) {
     throw new Error('人生充满意外，需要放平心态');
   }
 
+	const 晓灰 = '#d4c4b7';
+	const 玉红 = '#c04851';
+	const 李紫 = '#2b1216';
+
   this.cvsChessboard;     // 棋盘画布
   this.cvsChesses;        // 棋子画布
   this.cvsFeedback;       // 反馈画布
