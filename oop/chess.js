@@ -14,23 +14,21 @@ function ChessGame(node) {
   this.chesses;  // 游戏中的棋子 
   this.canvas;   // 游戏画布
 
-  // 更新棋子并触发棋子层重绘
-  this.updateChesses = function (chesses) {
-    this.chesses = chesses;
-    this.canvas.cvsChesses.dispatchEvent(new Event('chess-update'));
-  }
+  this.playerRed;    // 红色玩家
+  this.playerBlack;  // 黑色玩家
+
+  this.isOngoing;  // 指示游戏是否正在进行
 
   this.init;     // 初始化游戏
-	
-  this.start;    // 开始游戏
-  this.pause;    // 暂停游戏
-  this.stop;     // 结束游戏
+  this.stop;     // 停止游戏
+
+  this.checkThreat;  // 检查某方的将是否正在受到攻击
 
   this.move;     // 移动棋子
   this.history;  // 行棋历史记录
 
   this.init = function () {
-    this.updateChesses([
+    this.chesses = [
       Chess('車', 0, 0), Chess('馬', 0, 1), Chess('象', 0, 2), Chess('士', 0, 3), 
       Chess('將', 0, 4), Chess('士', 0, 5), Chess('象', 0, 6), Chess('馬', 0, 7), 
       Chess('車', 0, 8), Chess('砲', 2, 1), Chess('砲', 2, 7), Chess('卒', 3, 0), 
@@ -39,7 +37,12 @@ function ChessGame(node) {
       Chess('帥', 9, 4), Chess('仕', 9, 5), Chess('相', 9, 6), Chess('傌', 9, 7), 
       Chess('俥', 9, 8), Chess('炮', 7, 1), Chess('炮', 7, 7), Chess('兵', 6, 0), 
       Chess('兵', 6, 2), Chess('兵', 6, 4), Chess('兵', 6, 6), Chess('兵', 6, 8),
-    ]);
+    ];
+    this.canvas.cvsChesses.dispatchEvent(new Event('chess-update'));
+  }
+
+  this.move = function () {
+    
   }
 
   this.node = node;
@@ -53,7 +56,7 @@ function Chess(rank, x, y) {
   if (!(this instanceof Chess)) {
     return new Chess(rank, x, y);
   }
-	
+  
   this.rank = rank;  // 棋名
   this.x = x;
   this.y = y;
@@ -69,9 +72,9 @@ function Chess(rank, x, y) {
         return 'red';
     }
   }
-	
+  
   this.listPossibleMove = function () {
-    switch (rank) {
+    switch (this.rank) {
       
     }
   }
@@ -80,7 +83,10 @@ function Chess(rank, x, y) {
 
 // 棋子移动对象
 function ChessMove() {
-  this.type;  // 移动类型：trivial（平凡）, attck（攻击）
+  this.chess;    // 欲移动的棋子
+  this.type;     // 移动类型：trivial（平凡）, attck（攻击）
+  this.targetX;  // 棋子移动的目标位置
+  this.targetY;
 }
 
 
@@ -93,10 +99,10 @@ function ChessGameCanvas(game) {
     throw new Error('人生充满意外，需要放平心态');
   }
 
-	const 晓灰 = '#d4c4b7';
-	const 玉红 = '#c04851';
-	const 李紫 = '#2b1216';
-	const 落英淡粉 = '#f9e8d0';
+  const 晓灰 = '#d4c4b7';
+  const 玉红 = '#c04851';
+  const 李紫 = '#2b1216';
+  const 落英淡粉 = '#f9e8d0';
 
   this.cvsChessboard;     // 棋盘画布
   this.cvsChesses;        // 棋子画布
@@ -154,10 +160,10 @@ function ChessGameCanvas(game) {
   this.drawChessboard = function () {
     let ctx = this.cvsChessboard.getContext('2d');
     ctx.save();
-		
-		ctx.lineWidth = this.cellLength / 32;
-		ctx.strokeStyle = 晓灰;
-		
+    
+    ctx.lineWidth = this.cellLength / 32;
+    ctx.strokeStyle = 晓灰;
+    
     // 绘制棋盘外围的边框
     ctx.strokeRect(0, 0, this.canvasWidth, this.canvasHeight);
     
@@ -237,8 +243,8 @@ function ChessGameCanvas(game) {
         }
       }
     }
-		
-		ctx.restore();
+    
+    ctx.restore();
   }
   
   // 中国象棋棋子
@@ -260,10 +266,10 @@ function ChessGameCanvas(game) {
         ctx.rotate(Math.PI);
       }
       
-			let colorChess;       // 棋子和边框的颜色
-			switch (camp) {
+      let colorChess;       // 棋子和边框的颜色
+      switch (camp) {
         case 'red': {
-					colorChess = 玉红;
+          colorChess = 玉红;
           break;
         }
         case 'black': {
@@ -271,25 +277,25 @@ function ChessGameCanvas(game) {
           break;
         }
       }
-			let colorBackground = 落英淡粉;  // 棋子背景颜色
+      let colorBackground = 落英淡粉;  // 棋子背景颜色
       
-			let radius = this.cellLength / 2.5;  // 棋子半径
+      let radius = this.cellLength / 2.5;  // 棋子半径
 
-			// 绘制棋子底色
-			ctx.fillStyle = colorBackground;
-			ctx.beginPath();
-			ctx.arc(0, 0, radius, 0, 2 * Math.PI);
-			ctx.fill();
-			
-      // 绘制棋子边框
-			ctx.strokeStyle = colorChess;
+      // 绘制棋子底色
+      ctx.fillStyle = colorBackground;
       ctx.beginPath();
-			ctx.lineWidth = this.cellLength / 32;
+      ctx.arc(0, 0, radius, 0, 2 * Math.PI);
+      ctx.fill();
+      
+      // 绘制棋子边框
+      ctx.strokeStyle = colorChess;
+      ctx.beginPath();
+      ctx.lineWidth = this.cellLength / 32;
       ctx.arc(0, 0, radius, 0, 2 * Math.PI);
       ctx.stroke();
       
       // 绘制棋子等级
-			ctx.fillStyle = colorChess;
+      ctx.fillStyle = colorChess;
       ctx.font = `${radius * 1.8}px KaiTi`
       ctx.textAlign = 'center';
       ctx.textBaseline = 'middle';
@@ -311,6 +317,5 @@ function ChessGameCanvas(game) {
 
   window.addEventListener('resize', this.draw.bind(this));
   this.cvsChesses.addEventListener('chess-update', this.drawChesses.bind(this));
-
   this.draw();
 }
