@@ -11,6 +11,17 @@ function LocalPlayer(game) {
   
   this.mouseInput = function (event) {
     let clickedObj = game.canvas.getChess(event.clientX, event.clientY));
+    if (clickedObj instanceof Chess) {
+      if (lastClickedChess) {
+        
+      }
+    }
+    if (clickedObj instanceof IdlePlace) {
+      if (lastClickedChess) {
+        
+      }
+      lastClickedChess = null;
+    }
   }
   
   game.canvas.cvsFeedback.addEventListener('click', this.mouseInput.bind(this));
