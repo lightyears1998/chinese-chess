@@ -96,6 +96,7 @@ function ChessGameCanvas(game) {
 	const 晓灰 = '#d4c4b7';
 	const 玉红 = '#c04851';
 	const 李紫 = '#2b1216';
+	const 落英淡粉 = '#f9e8d0';
 
   this.cvsChessboard;     // 棋盘画布
   this.cvsChesses;        // 棋子画布
@@ -152,7 +153,11 @@ function ChessGameCanvas(game) {
   // 高10单元格，其中内外边框距1格、各阵营高度4格、楚河汉界1格
   this.drawChessboard = function () {
     let ctx = this.cvsChessboard.getContext('2d');
-    
+    ctx.save();
+		
+		ctx.lineWidth = this.cellLength / 32;
+		ctx.strokeStyle = 晓灰;
+		
     // 绘制棋盘外围的边框
     ctx.strokeRect(0, 0, this.canvasWidth, this.canvasHeight);
     
@@ -232,6 +237,8 @@ function ChessGameCanvas(game) {
         }
       }
     }
+		
+		ctx.restore();
   }
   
   // 中国象棋棋子
@@ -253,24 +260,36 @@ function ChessGameCanvas(game) {
         ctx.rotate(Math.PI);
       }
       
-      switch (camp) {
+			let colorChess;       // 棋子和边框的颜色
+			switch (camp) {
         case 'red': {
-          ctx.fillStyle = 'red';
+					colorChess = 玉红;
           break;
         }
-        case 'balck': {
-          ctx.fillStyle = 'balck';
+        case 'black': {
+          colorChess = 李紫;
           break;
         }
       }
+			let colorBackground = 落英淡粉;  // 棋子背景颜色
       
+			let radius = this.cellLength / 2.5;  // 棋子半径
+
+			// 绘制棋子底色
+			ctx.fillStyle = colorBackground;
+			ctx.beginPath();
+			ctx.arc(0, 0, radius, 0, 2 * Math.PI);
+			ctx.fill();
+			
       // 绘制棋子边框
+			ctx.strokeStyle = colorChess;
       ctx.beginPath();
-      let radius = 0.4 * this.cellLength;
+			ctx.lineWidth = this.cellLength / 32;
       ctx.arc(0, 0, radius, 0, 2 * Math.PI);
       ctx.stroke();
       
-      // 绘制棋子等级 
+      // 绘制棋子等级
+			ctx.fillStyle = colorChess;
       ctx.font = `${radius * 1.8}px KaiTi`
       ctx.textAlign = 'center';
       ctx.textBaseline = 'middle';
