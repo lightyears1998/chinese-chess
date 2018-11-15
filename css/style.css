@@ -26,4 +26,5 @@ a{
     font-size: 18px;
 	border-radius: 10px;
 	background-color: rgb(221, 200, 113);
+	cursor: pointer;
 }

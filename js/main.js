@@ -44,11 +44,12 @@ var isClick = false;
 var firstChess, firstChessX, firstChessY;
 var turn = 0;  // 偶数表示轮到红棋落子，奇数表示轮到黑棋落子
 var room;
+var isOver = false;  // 为true时即游戏结束不能再移动棋子
 $(function(){
 	responsive();     // 响应式设计
 	checkerboard();    // 绘制棋盘
-	init();
-	
+	init();	
+	$("#roomId").val("");
 });
 // 实时监听鼠标点击
 window.onmousedown = function(event) {
@@ -57,7 +58,7 @@ window.onmousedown = function(event) {
 	var chessY = Math.round(toLeft / ceilWidth);    // 所点击位置的行列
 	var chessX = Math.round(toTop / ceilHeight);
 	// console.log(chessX + " " + chessY);
-	if(chessY >= 0 && chessY <= 8 && chessX >= 0 && chessX <= 9)    // 点击范围需要在棋盘中
+	if(chessY >= 0 && chessY <= 8 && chessX >= 0 && chessX <= 9 && isOver !== true)    // 点击范围需要在棋盘中
 	{
 		// console.log(chessX + " " + chessY);
 		if(isClick === false && mark[chessX][chessY] !== 0) {    // 第一次点击，需要点击棋子
@@ -81,12 +82,13 @@ window.onmousedown = function(event) {
 			}
 			else {    // 第二次点击，点击到空位或对方棋子
 				if(isConformRule(firstChess, firstChess.x, firstChess.y, chessX, chessY)){
-					// console.log(mark[chessX][chessY]);
 					if(mark[chessX][chessY].name === "将") {
 						alert("红棋胜！" + "\n" + "双方共行了" + turn + "步棋。");
+						isOver = true;
 					}
 					else if(mark[chessX][chessY].name === "帅") {
 						alert("黑棋胜！" + "\n" + "双方共行了" + turn + "步棋。");
+						isOver = true;
 					}
 					mark[chessX][chessY] = Object.assign(firstChess);  // 将棋子移动到第二次点击的位置
 					mark[chessX][chessY].x = chessX;
@@ -94,7 +96,9 @@ window.onmousedown = function(event) {
 					mark[firstChessX][firstChessY] = 0;  // 清除第一次点击的棋子的所在位置, 在init函数中mark数组已经是指向棋子对象的引用了！	
 					isClick = false;  
 					turn++;
-					send();  // 向服务器传递棋盘变化数据
+					if(!($("#roomId").val() === "")){  // 如果没有填写房间号则是单人模式，不需用到服务器
+						send();  // 向服务器传递棋盘变化数据
+					}
 					changeChess();	// 重新绘制棋子位置
 					playAudio();  // 播放下棋音效
 				}
@@ -218,6 +222,7 @@ function init() {
 	mark[6][6] = blackPawn4;
 	mark[6][8] = blackPawn5;
 	turn = 0;
+	isOver = false;
 	changeChess();
 }
 // 根据标记数组绘制棋子
@@ -231,13 +236,19 @@ function changeChess() {
 		}
 	} 
 }
-
 // 确定进入房间
 $("#btn").click(function(){
+	if($("#roomId").val() === "") {
+		alert("若要进行双人模式则房间号不能为空。");
+	}
 	room = $("#roomId").val();
 	get();
 });
-
+// 重新开始
+$("#new").click(function(){
+	init();
+	send();
+});
 // 向服务器传递棋盘变化数据
 function send() {
 	$.ajax({
@@ -248,7 +259,8 @@ function send() {
 			roomId: room,
 			arr: JSON.stringify({
 				mark: mark,
-				turn, turn
+				turn: turn,
+				isOver: isOver
 			}) 
 		}
 	});
@@ -264,11 +276,14 @@ function get() {
 		},
 		success: function(response) {
 			if (response) {
-				console.log(response);
 				let group = JSON.parse(response);
 				turn = group.turn;
 				mark = group.mark;
+				isOver = group.isOver;
 				changeChess();
+			}
+			else {
+				init();
 			}
 		},
 		error: function(response) {
@@ -276,4 +291,8 @@ function get() {
 		}
 	});
 }
-$(setInterval(get, 1000));
+var timer = setInterval(function(){
+	if(room !== undefined){
+		get();
+	}
+},1000);
