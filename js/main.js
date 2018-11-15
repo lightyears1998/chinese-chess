@@ -7,7 +7,7 @@ var ceilWidth, ceilHeight;  // 格子大小
 var chessSize;   // 棋子大小
 var chessFontSize;  // 棋子文字大小
 var mark = new Array();   // 标记棋盘上该位置是否有棋子
- // 棋子对象
+// 棋子对象
 var redKing = new Chess("red", "帅", 0, 4);
 	redGuard1 = new Chess("red", "士", 0, 3);
 	redGuard2 = new Chess("red", "士", 0, 5);
@@ -45,6 +45,8 @@ var firstChess, firstChessX, firstChessY;
 var turn = 0;  // 偶数表示轮到红棋落子，奇数表示轮到黑棋落子
 var room;
 var isOver = false;  // 为true时即游戏结束不能再移动棋子
+var timer;
+var onlyPopOne = false;  // 只弹出一次游戏结果，为true时即游戏结束不再弹出
 $(function(){
 	responsive();     // 响应式设计
 	checkerboard();    // 绘制棋盘
@@ -57,10 +59,8 @@ window.onmousedown = function(event) {
 	var toTop = event.clientY - canvas.offsetTop - paddingY;
 	var chessY = Math.round(toLeft / ceilWidth);    // 所点击位置的行列
 	var chessX = Math.round(toTop / ceilHeight);
-	// console.log(chessX + " " + chessY);
 	if(chessY >= 0 && chessY <= 8 && chessX >= 0 && chessX <= 9 && isOver !== true)    // 点击范围需要在棋盘中
 	{
-		// console.log(chessX + " " + chessY);
 		if(isClick === false && mark[chessX][chessY] !== 0) {    // 第一次点击，需要点击棋子
 			if(mark[chessX][chessY].group === "black" && turn%2 === 0){     // 错误操作，应该轮到红棋落子
 				alert("轮到红棋落子");
@@ -82,21 +82,21 @@ window.onmousedown = function(event) {
 			}
 			else {    // 第二次点击，点击到空位或对方棋子
 				if(isConformRule(firstChess, firstChess.x, firstChess.y, chessX, chessY)){
-					if(mark[chessX][chessY].name === "将") {
-						alert("红棋胜！" + "\n" + "双方共行了" + turn + "步棋。");
+					turn++;
+					if(mark[chessX][chessY].name === "将" ){
 						isOver = true;
+						if(room === undefined)  alert("红棋胜！" + "\n" + "双方共行了" + turn + "步棋。");   // 单独为单人模式弹出结果信息
 					}
 					else if(mark[chessX][chessY].name === "帅") {
-						alert("黑棋胜！" + "\n" + "双方共行了" + turn + "步棋。");
 						isOver = true;
+						if(room === undefined)  alert("黑棋胜！" + "\n" + "双方共行了" + turn + "步棋。");
 					}
 					mark[chessX][chessY] = Object.assign(firstChess);  // 将棋子移动到第二次点击的位置
 					mark[chessX][chessY].x = chessX;
 					mark[chessX][chessY].y = chessY; 
 					mark[firstChessX][firstChessY] = 0;  // 清除第一次点击的棋子的所在位置, 在init函数中mark数组已经是指向棋子对象的引用了！	
-					isClick = false;  
-					turn++;
-					if(!($("#roomId").val() === "")){  // 如果没有填写房间号则是单人模式，不需用到服务器
+					isClick = false;  		
+					if($("#roomId").val() !== undefined){  // 如果没有填写房间号则是单人模式，不需用到服务器
 						send();  // 向服务器传递棋盘变化数据
 					}
 					changeChess();	// 重新绘制棋子位置
@@ -223,6 +223,7 @@ function init() {
 	mark[6][8] = blackPawn5;
 	turn = 0;
 	isOver = false;
+	onlyPopOne = false;
 	changeChess();
 }
 // 根据标记数组绘制棋子
@@ -281,8 +282,26 @@ function get() {
 				mark = group.mark;
 				isOver = group.isOver;
 				changeChess();
-			}
-			else {
+				if(isOver === true){			
+					var redFail = true;
+					for(var i=0; i<=2; i++) {
+						for(var j=3; j<=5; j++) {
+							if(mark[i][j] !== 0 && mark[i][j].name === "帅"){
+								redFail = false;
+							}
+						}
+					}	
+					if(redFail === true && onlyPopOne === false) {
+						onlyPopOne = true;
+						alert("黑棋胜！" + "\n" + "双方共行了" + turn + "步棋。");
+					}   
+					else if(redFail === false && onlyPopOne === false) {
+						onlyPopOne = true;
+						alert("红棋胜！" + "\n" + "双方共行了" + turn + "步棋。");
+					}
+				}
+			}	
+			else {   
 				init();
 			}
 		},
@@ -291,7 +310,7 @@ function get() {
 		}
 	});
 }
-var timer = setInterval(function(){
+timer = setInterval(function(){
 	if(room !== undefined){
 		get();
 	}

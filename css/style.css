@@ -3,7 +3,6 @@ body{
 	padding: 0;
 }
 .room{
-	/* display: line-block; */
 	position: relative;
 	margin: 5px 10px;
 }

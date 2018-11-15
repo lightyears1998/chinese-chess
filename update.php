@@ -1,5 +1,4 @@
 <?php
-
 if(isset($_REQUEST['roomId'])){
 	$hash = hash('sha1', $_REQUEST['roomId']);
 	$file = $hash.'.txt';
