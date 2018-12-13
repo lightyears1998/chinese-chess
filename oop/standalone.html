@@ -1,21 +1,21 @@
 <!DOCTYPE html>
 <html style="width: 100%; height: 100%;">
-	<head>
-		<meta charset="utf-8">
+  <head>
+    <meta charset="utf-8">
     <title>中国象棋</title>
     <script src="human.js"></script>
-		<script src="chess.js"></script>
-		<script>
+    <script src="chess.js"></script>
+    <script>
       var GAME;
       document.addEventListener('DOMContentLoaded', function (event) {
         GAME = new ChessGame(document.getElementById('chess-game'));
         GAME.startSelfPractice();
       });
     </script>
-	</head>
-	<body style="position: absolute; left: 0; top: 0; right: 0; bottom: 0;">
-		<div id="chess-game" style="width: 100%; height: 100%;">
-			<!-- 将在此处绘制游戏 -->
-		</div>
-	</body>
+  </head>
+  <body style="position: absolute; left: 0; top: 0; right: 0; bottom: 0;">
+    <div id="chess-game" style="width: 100%; height: 100%;">
+      <!-- 将在此处绘制游戏 -->
+    </div>
+  </body>
 </html>
