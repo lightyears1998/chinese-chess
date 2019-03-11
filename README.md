@@ -1,4 +1,7 @@
-# Chinese chess on the web    
+# Chinese chess on the web  
+
+## Technology stack
+jQuery + ajax + php
 
 ## Introduction
 If both parties enter the same room number, it is a double mode. Otherwise, it is in single mode.
@@ -12,5 +15,6 @@ First click on the chess pieces you want to move (the red flag should be carried
 Rebuild the project with Vue and support for mobile gaming.
 
 ---
-**Welcome to provide your issues, pr and ideas!**
+
+**Welcome to provide your issues, pull requests and ideas!**
 
