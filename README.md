@@ -1,4 +1,16 @@
-Web版的中国象棋：  
-输入约定的房间号进入双人模式，否则为单人模式。  
-该版本中国象棋没有对对弈双方进行验证，即任意一方都可以控制红黑棋，所以要自觉遵守下棋规则啊QWQ  
-欢迎提供issues和ideas！  
+# Chinese chess on the web    
+
+## Introduction
+If both parties enter the same room number, it is a double mode. Otherwise, it is in single mode.
+
+This version of Chinese chess does not verify the two players, which means either side can control red and black chess. So consciously abide by the rules of playing chess.   
+
+## The rules of the game
+First click on the chess pieces you want to move (the red flag should be carried first), and then click on the position you want to move. If you follow the rules of Chinese chess, you can move successfully. The red and black sides alternate until the end of the game.
+
+## Expected improvement
+Rebuild the project with Vue and support for mobile gaming.
+
+---
+**Welcome to provide your issues, pr and ideas!**
+
