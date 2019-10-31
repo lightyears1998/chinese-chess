@@ -1,3 +1,5 @@
+const baseUrl = 'http:/localhost:88';
+
 var canvas = document.getElementById("canvas");  // 布置画布
 var context = canvas.getContext("2d");
 var canvasWidth, canvasHeight;  // 画布大小
@@ -80,6 +82,7 @@ window.onmousedown = function(event) {
 			if(mark[chessX][chessY].group === firstChess.group){  // 第二次点击，点击到己方的棋子则无效
 				isClick = false;
 				alert("该位置已经有己方棋子存在了,请重新选择要移动的棋子");
+				drawChess(firstChess, false);
 			}
 			else {    // 第二次点击，点击到空位或对方棋子
 				if(isConformRule(firstChess, firstChess.x, firstChess.y, chessX, chessY)){
@@ -106,22 +109,26 @@ window.onmousedown = function(event) {
 				else {
 					isClick = false;
 					alert("棋子移动不符合规则,请重新选择要移动的棋子");
+					drawChess(firstChess, false);
 				}
 			}
 		}
 	}
 }
+
 // 播放下棋的音效
 function playAudio(){
 	var audio = document.getElementById("audio");
 	audio.play();
 } 
+
 // 实时监听浏览器宽高变化
 $(window).resize(function() {
 	responsive();
 	checkerboard();
 	changeChess();
 });
+
 // 棋子的构造函数
 function Chess(group, name, x, y) {
 	this.group = group;
@@ -129,6 +136,7 @@ function Chess(group, name, x, y) {
 	this.x = x;
 	this.y = y;
 }
+
 // 响应式设计
 function responsive() {
 	// 获取浏览器可使用的宽高
@@ -150,6 +158,7 @@ function responsive() {
 	chessFontSize = Math.ceil(chessSize * 0.7);
 	$(".box").width(canvasWidth).height(canvasHeight);
 }
+
 // 初始化mark数组
 function init() {
 	for(var i=0; i<=9; i++){
@@ -227,6 +236,7 @@ function init() {
 	onlyPopOne = false;
 	changeChess();
 }
+
 // 根据标记数组绘制棋子
 function changeChess() {
 	context = canvas.getContext("2d");  // 需要重新布置画布才能及时显示棋子，画在canvas上的东西不会凭空产生消失
@@ -238,50 +248,59 @@ function changeChess() {
 		}
 	} 
 }
+
 // 确定进入房间
 $("#btn").click(function(){
 	if($("#roomId").val() === "") {
 		alert("若要进行双人模式则房间号不能为空。");
 	}
 	room = $("#roomId").val();
-	get();
+	sendInfo();
+	getInfo();
 });
+
 // 重新开始
 $("#new").click(function(){
 	init();
 	send();
 });
-// 向服务器传递棋盘变化数据
-function send() {
+
+// timer = setInterval(function(){
+// 	if(room !== undefined){
+// 		get();
+// 	}
+// }, 1000);
+
+function sendInfo() {
 	$.ajax({
-		type: "post",
-		url : "update.php",
+		type: 'post',
+		url : baseUrl + '/set',
 		data: {
-			action: "send",
 			roomId: room,
-			arr: JSON.stringify({
-				mark: mark,
-				turn: turn,
-				isOver: isOver
-			}) 
-		}
+			turn: turn,
+			isOver: isOver,
+			mark: JSON.stringify(mark)
+		},
+		error: function(err) {
+			console.log(err);
+		},
 	});
 }
-// 从服务器获取棋盘变化数据
-function get() {
+
+function getInfo() {
 	$.ajax({
-		type: "post",
-		url: "update.php",
+		type: 'get',
+		url: baseUrl + '/get',
 		data: {
-			action: "get",
-			roomId: room
+			roomId: 1
+			// roomId: room
 		},
 		success: function(response) {
 			if (response) {
 				let group = JSON.parse(response);
 				turn = group.turn;
-				mark = group.mark;
 				isOver = group.isOver;
+				mark = JSON.parse(group.mark);
 				changeChess();
 				if(isOver === true){			
 					var redFail = true;
@@ -311,8 +330,3 @@ function get() {
 		}
 	});
 }
-timer = setInterval(function(){
-	if(room !== undefined){
-		get();
-	}
-},1000);
