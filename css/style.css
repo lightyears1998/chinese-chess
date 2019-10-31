@@ -1,29 +1,64 @@
-body{
+* {
 	margin: 0;
 	padding: 0;
 }
-.room{
-	position: relative;
-	margin: 5px 10px;
+
+body {
+	font-family: Helvetica Neue,Helvetica,PingFang SC,Microsoft YaHei,Tahoma,Arial;
 }
-a{
+
+a {
 	text-decoration: none;
 	color: rgb(233, 221, 182);
 }
-.box{
+
+input,
+button {
+	outline: none;
+}
+
+.app {
+	display: flex;
+}
+
+
+.box {
 	display: block;
-	margin: 0 auto;
-} 
-.new{
-	position: relative;
-	float: left;
-	margin-left: 10px;
-    width: 120px;
-    height: 40px;
-    text-align: center;
-    line-height: 40px;
-    font-size: 18px;
-	border-radius: 10px;
-	background-color: rgb(221, 200, 113);
+	margin: 20px auto 0 ;
+}
+
+.nav-box {
+	border-left: 1px solid #eee;
+	width: 500px;
+	height: 100vh;
+	box-sizing: border-box;
+	padding: 10px;
+}
+
+.room {
+	height: 25px;
+}
+.room input {
+	width: 200px;
+	height: 100%;
+}
+.enter-room {
+	width: 70px;
+  height: 100%;
+	border-radius: 4px;
 	cursor: pointer;
+}
+.new {
+	width: 70px;
+	height: 100%;
+	margin-left: 10px;
+	text-align: center;
+	border-radius: 4px;
+	cursor: pointer;
+}
+
+.chat-box {
+	width: 100%;
+	height: calc(100% - 50px);
+	margin-top: 20px;
 }

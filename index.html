@@ -7,17 +7,23 @@
 		<link rel="stylesheet" href="css/style.css">
 	</head>
 	<body>
-		<div class="room">
-			<label for="roomId">输入房间号:</label>
-			<input id="roomId">
-			<button id="btn">进入房间</button>
+		<div class="app">
+			<div class="box">   
+				<canvas id="canvas" class="canvas"></canvas> 	
+			</div>
+			<div class="nav-box">
+				<div class="room">
+					<input id="roomId" placeholder="输入约定的房间号进行联网模式">
+					<button id="btn" class="enter-room">进入房间</button>
+					<button id="new" class="new">重新开始</button>	
+				</div>
+				<div class="chat-box">
+					<p>hello world</p>
+				</div>
+			</div>
 		</div>
-		<div class="new">
-			<a id="new">New Game</a>	
-		</div>
-		<div class="box">   
-			<canvas id="canvas" class="canvas"></canvas> 	
-		</div>	
+
+
 		<audio id="audio" src="http://fjdx.sc.chinaz.com/Files/DownLoad/sound1/201501/5390.mp3"></audio>
 		<script src="https://cdn.bootcss.com/jquery/1.12.4/jquery.min.js"></script>
 		<script src="js/checkerboard.js"></script>

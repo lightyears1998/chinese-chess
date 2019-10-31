@@ -73,6 +73,7 @@ window.onmousedown = function(event) {
 				firstChessX = chessX;
 				firstChessY = chessY;
 				isClick = true;        // 标记已有第一次点击		
+				drawChess(mark[chessX][chessY], true);
 			}
 		}
 		else if(isClick === true) {    	
@@ -112,8 +113,8 @@ window.onmousedown = function(event) {
 }
 // 播放下棋的音效
 function playAudio(){
-	var audio= document.getElementById("audio");
-    audio.play();
+	var audio = document.getElementById("audio");
+	audio.play();
 } 
 // 实时监听浏览器宽高变化
 $(window).resize(function() {
@@ -146,7 +147,7 @@ function responsive() {
 	boxWidth = canvasWidth - paddingX * 2;
 	boxHeight = canvasHeight - paddingY * 2 ;
 	chessSize = Math.ceil(ceilWidth * 0.4);
-	chessFontSize = Math.ceil(chessSize*0.8);
+	chessFontSize = Math.ceil(chessSize * 0.7);
 	$(".box").width(canvasWidth).height(canvasHeight);
 }
 // 初始化mark数组

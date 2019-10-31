@@ -1,7 +1,11 @@
+const chessColor = "rgb(221, 200, 113)";
+const firstClickChessColor = "rgb(218, 191, 78)";
+
 // 绘制棋盘
 function checkerboard() {	
 	drawCheckerboard();     
 }
+
 // 画线
 function cross(sx, sy, ex, ey, bw) {
 	context.beginPath();
@@ -12,6 +16,7 @@ function cross(sx, sy, ex, ey, bw) {
 	context.stroke();
 	context.closePath();
 }
+
 // 画棋盘
 function drawCheckerboard() {
 	// 外框
@@ -99,30 +104,30 @@ function drawCheckerboard() {
 		}
 	}
 	// 楚河汉界
-	var fontSize = ceilHeight / 1.5;
+	var fontSize = ceilHeight / 2;
 	context.font = String(fontSize) + 'px' + " KaiTi";
 	context.fillStyle = "red";
-	context.fillText("楚河", ceilWidth*0.8, ceilHeight*5+paddingY/2);
-	context.fillText("汉界", ceilWidth*6.8, ceilHeight*5+paddingY/2);
+	context.fillText("楚河", ceilWidth, ceilHeight * 5 + paddingY / 2.5);
+	context.fillText("汉界", ceilWidth * 7, ceilHeight * 5 + paddingY / 2.5);
 }
-// 画棋子
-function drawChess(obj) {
-	if(obj !== 0){
-			context.beginPath();
-			context.strokeStyle = "rgb(221, 200, 113)";
-			context.fillStyle = "rgb(221, 200, 113)";
-			context.arc(obj.y*ceilWidth+paddingX, obj.x*ceilHeight+paddingY, chessSize, 0, 2*Math.PI);
-			context.fill();
-			if(obj.group === "red") {
-				context.fillStyle = "red";
-			}
-			if(obj.group === "black") {
-				context.fillStyle = "black";
-			}
-			context.font = String(chessFontSize) + 'px' + "KaiTi";
-			context.fillText(obj.name, obj.y*ceilWidth+paddingX/2.8, obj.x*ceilHeight+paddingY*1.5);
-			context.stroke();
-			context.closePath();
-	}
 
+// 画棋子
+function drawChess(obj, firstClick) {
+	var color = firstClick ? firstClickChessColor : chessColor;
+	if(obj !== 0){
+		context.beginPath();
+		context.strokeStyle = color;		
+		context.fillStyle = color;
+		context.arc(obj.y*ceilWidth+paddingX, obj.x*ceilHeight+paddingY, chessSize, 0, 2*Math.PI);
+		context.fill();
+		if(obj.group === "red") {
+			context.fillStyle = "red";
+		}
+		if(obj.group === "black") {
+			context.fillStyle = "black";
+		}
+		context.fillText(obj.name, obj.y*ceilWidth+paddingX/2, obj.x*ceilHeight+paddingY*1.4);
+		context.stroke();
+		context.closePath();
+	}
 }
