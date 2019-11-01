@@ -50,16 +50,30 @@ const app = http.createServer(function(req, res) {
 
 
 const io = require('socket.io')(app);
-var clientArr = [];
+var roomObj = {};
 
 io.on('connection', function (socket) {
-  clientArr.push(socket.id);
-  console.log(clientArr);
-  // 和客户端建立通信后给客户端发送 服务器和这个客户端的通信id，以此来区分和不同客户端的连接
-  io.emit('clientInfo', {
-    curClientId: socket.id,
-    clientCount: clientArr.length
-  });
+  console.log(1);
+
+  socket.on('createRoom', function(room) {
+    roomObj[room] = roomObj[room] ? roomObj[room] : [];
+    // 第一个进入房间的人执红棋，第二个进入的执黑棋
+    const group = (roomObj[room].length === 0 ? 0 : (roomObj[room].length === 1 ? 1 : null));
+    roomObj[room].push({
+      id: socket.id,
+      group
+    });
+    console.log('roomObj');
+    console.log(roomObj);
+    // 和客户端建立通信后给客户端发送 服务器和这个客户端的通信id，以此来区分和不同客户端的连接
+    io.emit('clientInfo', {
+      roomClientCount: roomObj[room].length,
+      clientInfo: {
+        id: socket.id,
+        group
+      }
+    });
+  })
 
   socket.on('clientChange', function (data) {
     io.emit('serverChange', data);
@@ -67,15 +81,27 @@ io.on('connection', function (socket) {
 
   socket.on('disconnect', function() {
     console.log('client断开连接了');
-    console.log(socket.id);
-    clientArr = clientArr.filter(function(val) {
-      return val !== socket.id;
-    })
-    console.log(clientArr);
-    io.emit('clientInfo', {
-      curClientId: socket.id,
-      clientCount: clientArr.length
-    });
+    var room = null;
+    // 寻找离线客户端所在的房间，并从房间中删除
+    for(var [roomId, clients] of Object.entries(roomObj)) {
+      var end = false;
+      // 遍历房间中的每个客户端
+      for (var i=0; i<clients.length; i++) {
+        if(clients[i].id === socket.id) {
+          clients.splice(i, 1);
+          room = roomId;
+          end = true;
+          break;
+        }
+        if(end) break;
+      }
+    }
+    console.log(roomObj);
+    if (room !== null) {
+      io.emit('clientInfo', {
+        roomClientCount: roomObj[room].length,
+      });
+    }
   })
 });
 

@@ -62,65 +62,66 @@ window.onmousedown = function(event) {
 	var toTop = event.clientY - canvas.offsetTop - paddingY;
 	var chessY = Math.round(toLeft / ceilWidth);    // 所点击位置的行列
 	var chessX = Math.round(toTop / ceilHeight);
-	if(chessY >= 0 && chessY <= 8 && chessX >= 0 && chessX <= 9 && isOver !== true)    // 点击范围需要在棋盘中
-	{
-		if(isClick === false && mark[chessX][chessY] !== 0) {    // 第一次点击，需要点击棋子
-			if(mark[chessX][chessY].group === "black" && turn%2 === 0){     // 错误操作，应该轮到红棋落子
-				showDialog("轮到红棋落子");
-			}
-			else if(mark[chessX][chessY].group === "red" && turn%2 === 1){  // 错误操作，应该轮到黑棋落子
-				showDialog("轮到黑棋落子");
-			}
-			else {
-				firstChess = Object.assign(mark[chessX][chessY]);    // 记录点击的棋子
-				firstChessX = chessX;
-				firstChessY = chessY;
-				isClick = true;        // 标记已有第一次点击		
-				drawChess(mark[chessX][chessY], true);
-			}
+	// 点击范围需要在棋盘中
+	if (!(chessY >= 0 && chessY <= 8 && chessX >= 0 && chessX <= 9 && isOver !== true)) {
+		return;
+	}
+	if (turn % 2 !== clientInfo.group && mark[chessX][chessY] !== 0) {
+		showDialog('轮到对方下棋了');
+		return;
+	}
+	if (isClick === false && mark[chessX][chessY] !== 0) {    // 第一次点击 && 点击到了棋子
+		if ((mark[chessX][chessY].group === "black" && clientInfo.group === 0) || 
+			(mark[chessX][chessY].group === "red" && clientInfo.group === 1)) {
+			showDialog("不能控制对方的棋子");
 		}
-		else if(isClick === true) {    	
-			if(mark[chessX][chessY].group === firstChess.group){  // 第二次点击，点击到己方的棋子则无效
-				isClick = false;
-				showDialog("该位置已经有己方棋子存在了,请重新选择要移动的棋子");
-				drawChess(firstChess, false);
+		else {
+			firstChess = Object.assign(mark[chessX][chessY]);    // 记录点击的棋子
+			firstChessX = chessX;
+			firstChessY = chessY;
+			isClick = true;        // 标记已有第一次点击
+			drawChess(mark[chessX][chessY], true);
+		}
+	}
+	else if(isClick === true) {    	// 第二次点击
+		if(mark[chessX][chessY].group === firstChess.group){  // 第二次点击，点击到己方的棋子则无效
+			isClick = false;
+			showDialog("该位置已经有己方棋子存在了,请重新选择要移动的棋子");
+			drawChess(firstChess, false);
+			return;
+		}
+		// 第二次点击，点击到空位或对方棋子了
+		if(isConformRule(firstChess, firstChess.x, firstChess.y, chessX, chessY)){
+			turn++;
+			if(mark[chessX][chessY].name === "将" ){
+				isOver = true;
+				if(room === undefined)  alert("红棋胜！" + "\n" + "双方共行了" + turn + "步棋。");   // 单独为单人模式弹出结果信息
 			}
-			else {    // 第二次点击，点击到空位或对方棋子
-				if(isConformRule(firstChess, firstChess.x, firstChess.y, chessX, chessY)){
-					turn++;
-					if(mark[chessX][chessY].name === "将" ){
-						isOver = true;
-						if(room === undefined)  alert("红棋胜！" + "\n" + "双方共行了" + turn + "步棋。");   // 单独为单人模式弹出结果信息
-					}
-					else if(mark[chessX][chessY].name === "帅") {
-						isOver = true;
-						if(room === undefined)  alert("黑棋胜！" + "\n" + "双方共行了" + turn + "步棋。");
-					}
-					mark[chessX][chessY] = Object.assign(firstChess);  // 将棋子移动到第二次点击的位置
-					mark[chessX][chessY].x = chessX;
-					mark[chessX][chessY].y = chessY; 
-					mark[firstChessX][firstChessY] = 0;  // 清除第一次点击的棋子的所在位置, 在init函数中mark数组已经是指向棋子对象的引用了！	
-					isClick = false;  		
-					if($("#roomId").val().trim() !== ''){  // 如果没有填写房间号则是单人模式，不需用到服务器
-						// 向服务器传递棋盘变化数据
-						// sendInfo();
-						// 通知服务器更新，
-						callServer({
-							roomId: room,
-							turn: turn,
-							isOver: isOver,
-							mark: JSON.stringify(mark)
-						});  
-					}
-					// changeChess();	// 重新绘制棋子位置
-					playAudio();  // 播放下棋音效
-				}
-				else {
-					isClick = false;
-					showDialog("棋子移动不符合规则,请重新选择要移动的棋子");
-					drawChess(firstChess, false);
-				}
+			else if(mark[chessX][chessY].name === "帅") {
+				isOver = true;
+				if(room === undefined)  alert("黑棋胜！" + "\n" + "双方共行了" + turn + "步棋。");
 			}
+			mark[chessX][chessY] = Object.assign(firstChess);  // 将棋子移动到第二次点击的位置
+			mark[chessX][chessY].x = chessX;
+			mark[chessX][chessY].y = chessY; 
+			mark[firstChessX][firstChessY] = 0;  // 清除第一次点击的棋子的所在位置, 在init函数中mark数组已经是指向棋子对象的引用了！	
+			isClick = false;  		
+			if($("#roomId").val().trim() !== '') {  // 如果没有填写房间号则是单人模式，不需用到服务器
+				// 通知服务器更新，
+				callServer({
+					roomId: room,
+					turn: turn,
+					isOver: isOver,
+					mark: JSON.stringify(mark)
+				});  
+			}
+			// changeChess();	// 重新绘制棋子位置
+			playAudio();  // 播放下棋音效
+		}
+		else {
+			isClick = false;
+			showDialog("棋子移动不符合规则,请重新选择要移动的棋子");
+			drawChess(firstChess, false);
 		}
 	}
 }
@@ -269,12 +270,15 @@ $("#btn").click(function(){
 		showDialog('你已经在 ' + room + ' 房间了');
 		return;
 	}
-	showDialog('进入房间成功');
+	if (room === undefined) {
+		showDialog('进入房间成功');
+	} else if (val !== room) {
+		showDialog('切换房间成功');
+		closeWs();
+	}
 	room = val;
 	// 进入房间后建立websocket
 	establishWS();
-	// sendInfo();
-	// getInfo();
 });
 
 // 重新开始
