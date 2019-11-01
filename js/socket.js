@@ -5,7 +5,7 @@ function establishWS() {
   socket = io('ws://localhost:88');
   socket.on('connect', function() {
     console.log('成功连接服务器');
-    socket.emit('createRoom', room);
+    socket.emit('enterRoom', room);
   })
 
   socket.on('disconnect', function(a) {
@@ -16,8 +16,19 @@ function establishWS() {
 
   // 获取当前客户端和服务器的通信id
   socket.on('clientInfo', function(obj) {
+    // 本客户端未连接服务器，提示本机的执棋信息，分为下棋者和观棋者
     if (clientInfo === null) {
       clientInfo = obj.clientInfo;
+      if (clientInfo.group === 0) {
+        showDialog('你执红棋先手，等待对方上线即可开始游戏'); 
+      } else if(clientInfo.group === 1) {
+        showDialog('你执黑棋后手，红棋已在线，等待对方落子');
+      } else {
+        showDialog(`成功进入${room}号房`);
+      }
+      // 本客户端已连接上（第一个连接的人所以是红棋），而黑棋刚连接上服务器
+    } else if (obj.clientInfo.group === 1) {
+      showDialog('黑棋已上线'); 
     }
     console.log(clientInfo);
     $('#peopleCount').text(obj.roomClientCount);

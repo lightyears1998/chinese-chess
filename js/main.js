@@ -264,10 +264,7 @@ $("#btn").click(function(){
 		showDialog('你已经在 ' + room + ' 房间了');
 		return;
 	}
-	if (room === undefined) {
-		showDialog('进入房间成功');
-	} else if (val !== room) {
-		showDialog('切换房间成功');
+	if (val !== room) {
 		closeWs();
 	}
 	room = val;

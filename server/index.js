@@ -53,7 +53,7 @@ const io = require('socket.io')(app);
 var roomObj = {};
 
 io.on('connection', function (socket) {
-  socket.on('createRoom', function(room) {
+  socket.on('enterRoom', function(room) {
     roomObj[room] = roomObj[room] ? roomObj[room] : [];
     // 第一个进入房间的人执红棋，第二个进入的执黑棋
     const group = (roomObj[room].length === 0 ? 0 : (roomObj[room].length === 1 ? 1 : null));
