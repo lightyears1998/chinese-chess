@@ -16,10 +16,14 @@
 					<input id="roomId" placeholder="输入约定的房间号进行联网模式">
 					<button id="btn" class="enter-room">进入房间</button>
 					<button id="new" class="new">重新开始</button>	
+					<p>当前房间有<span id="peopleCount">0</span>人在线</p>
 				</div>
-				<div class="chat-box">
+				<!-- <div class="chat-box">
 					<p>hello world</p>
-				</div>
+				</div> -->
+			</div>
+			<div class="dialog" id="dialog">
+				<p></p>
 			</div>
 		</div>
 
@@ -31,5 +35,6 @@
 		<script src="js/main.js"></script>
 		<script src="js/rule.js"></script>
 		<script src="js/socket.js"></script>
+		<script src="js/utils.js"></script>
 	</body>
 </html>

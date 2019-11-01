@@ -18,3 +18,25 @@ Rebuild the project with Vue and support for mobile gaming.
 
 **Welcome to provide your issues, pull requests and ideas!**
 
+
+## 2019.10 更新日记
+
+- 视觉优化
+
+  - [x] 更新UI。
+
+  - [x] 取消 alert 框，使用自定义的dialog，提高游戏流畅度。
+
+
+- 游戏
+  - [] 判断下棋双方的身份，不允许第三方插手 and 下棋一方控制对方的棋子。
+
+  - [] 增加聊天室。
+
+  - [] 博弈双方上下线通知，当前房间人数统计。 
+
+- 代码
+  - [x] 取消原先的 php 代码，使用 node 重写。
+
+  - [x] 取消 Ajax 轮询服务器，使用 webSocket 进行通信。
+

@@ -55,6 +55,7 @@ $(function(){
 	init();	
 	$("#roomId").val("");
 });
+
 // 实时监听鼠标点击
 window.onmousedown = function(event) {
 	var toLeft = event.clientX - canvas.offsetLeft - paddingX;
@@ -65,10 +66,10 @@ window.onmousedown = function(event) {
 	{
 		if(isClick === false && mark[chessX][chessY] !== 0) {    // 第一次点击，需要点击棋子
 			if(mark[chessX][chessY].group === "black" && turn%2 === 0){     // 错误操作，应该轮到红棋落子
-				alert("轮到红棋落子");
+				showDialog("轮到红棋落子");
 			}
 			else if(mark[chessX][chessY].group === "red" && turn%2 === 1){  // 错误操作，应该轮到黑棋落子
-				alert("轮到黑棋落子");
+				showDialog("轮到黑棋落子");
 			}
 			else {
 				firstChess = Object.assign(mark[chessX][chessY]);    // 记录点击的棋子
@@ -81,7 +82,7 @@ window.onmousedown = function(event) {
 		else if(isClick === true) {    	
 			if(mark[chessX][chessY].group === firstChess.group){  // 第二次点击，点击到己方的棋子则无效
 				isClick = false;
-				alert("该位置已经有己方棋子存在了,请重新选择要移动的棋子");
+				showDialog("该位置已经有己方棋子存在了,请重新选择要移动的棋子");
 				drawChess(firstChess, false);
 			}
 			else {    // 第二次点击，点击到空位或对方棋子
@@ -100,15 +101,23 @@ window.onmousedown = function(event) {
 					mark[chessX][chessY].y = chessY; 
 					mark[firstChessX][firstChessY] = 0;  // 清除第一次点击的棋子的所在位置, 在init函数中mark数组已经是指向棋子对象的引用了！	
 					isClick = false;  		
-					if($("#roomId").val() !== undefined){  // 如果没有填写房间号则是单人模式，不需用到服务器
-						send();  // 向服务器传递棋盘变化数据
+					if($("#roomId").val().trim() !== ''){  // 如果没有填写房间号则是单人模式，不需用到服务器
+						// 向服务器传递棋盘变化数据
+						// sendInfo();
+						// 通知服务器更新，
+						callServer({
+							roomId: room,
+							turn: turn,
+							isOver: isOver,
+							mark: JSON.stringify(mark)
+						});  
 					}
-					changeChess();	// 重新绘制棋子位置
+					// changeChess();	// 重新绘制棋子位置
 					playAudio();  // 播放下棋音效
 				}
 				else {
 					isClick = false;
-					alert("棋子移动不符合规则,请重新选择要移动的棋子");
+					showDialog("棋子移动不符合规则,请重新选择要移动的棋子");
 					drawChess(firstChess, false);
 				}
 			}
@@ -249,27 +258,29 @@ function changeChess() {
 	} 
 }
 
-// 确定进入房间
+// 进入房间
 $("#btn").click(function(){
-	if($("#roomId").val() === "") {
-		alert("若要进行双人模式则房间号不能为空。");
+	const val = $("#roomId").val();
+	if(val.trim() === "") {
+		showDialog('若要进入联机模式则房间号不能为空');
+		return;
 	}
-	room = $("#roomId").val();
-	sendInfo();
-	getInfo();
+	if (val === room) {
+		showDialog('你已经在 ' + room + ' 房间了');
+		return;
+	}
+	showDialog('进入房间成功');
+	room = val;
+	// 进入房间后建立websocket
+	establishWS();
+	// sendInfo();
+	// getInfo();
 });
 
 // 重新开始
 $("#new").click(function(){
 	init();
-	send();
 });
-
-// timer = setInterval(function(){
-// 	if(room !== undefined){
-// 		get();
-// 	}
-// }, 1000);
 
 function sendInfo() {
 	$.ajax({
@@ -280,6 +291,12 @@ function sendInfo() {
 			turn: turn,
 			isOver: isOver,
 			mark: JSON.stringify(mark)
+		},
+		success: function(res) {
+			const { roomExist } = JSON.parse(res);
+			if (roomExist) {
+				showDialog('房间已存在，沿用已经存在的棋盘信息');
+			}
 		},
 		error: function(err) {
 			console.log(err);
@@ -292,8 +309,7 @@ function getInfo() {
 		type: 'get',
 		url: baseUrl + '/get',
 		data: {
-			roomId: 1
-			// roomId: room
+			roomId: room
 		},
 		success: function(response) {
 			if (response) {
@@ -301,6 +317,7 @@ function getInfo() {
 				turn = group.turn;
 				isOver = group.isOver;
 				mark = JSON.parse(group.mark);
+				console.log(mark);
 				changeChess();
 				if(isOver === true){			
 					var redFail = true;

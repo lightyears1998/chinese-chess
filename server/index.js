@@ -16,13 +16,21 @@ const app = http.createServer(function(req, res) {
     req.on('end', function() {    
       const result = querystring.parse(postData);
       const filePath = path.join(__dirname, './boardInfo', './' + result.roomId + '.txt');
-      fs.writeFile(filePath, JSON.stringify(result), function(err) {
+
+      fs.access(filePath, function(err) {
         if (err) {
-          res.end(err);
+          fs.writeFile(filePath, JSON.stringify(result), function(err) {
+            if (err) {
+              res.end(err);
+            } else {
+              res.end(JSON.stringify({roomExist: false}));
+            }
+          })
         } else {
-          res.end();
+          res.end(JSON.stringify({roomExist: true}));
         }
-      })
+      });
+
     });
   } else if (routeUrl === '/get') {
     const { roomId } = url.parse(req.url, true).query;
@@ -42,11 +50,32 @@ const app = http.createServer(function(req, res) {
 
 
 const io = require('socket.io')(app);
+var clientArr = [];
 
 io.on('connection', function (socket) {
-  // io.emit('msg', 'server emit');
-  
-  socket.on('msg1', function (data) {
-    console.log('server on msg1:', data);
+  clientArr.push(socket.id);
+  console.log(clientArr);
+  // 和客户端建立通信后给客户端发送 服务器和这个客户端的通信id，以此来区分和不同客户端的连接
+  io.emit('clientInfo', {
+    curClientId: socket.id,
+    clientCount: clientArr.length
   });
+
+  socket.on('clientChange', function (data) {
+    io.emit('serverChange', data);
+  });
+
+  socket.on('disconnect', function() {
+    console.log('client断开连接了');
+    console.log(socket.id);
+    clientArr = clientArr.filter(function(val) {
+      return val !== socket.id;
+    })
+    console.log(clientArr);
+    io.emit('clientInfo', {
+      curClientId: socket.id,
+      clientCount: clientArr.length
+    });
+  })
 });
+
