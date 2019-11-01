@@ -48,7 +48,6 @@ var turn = 0;  // 偶数表示轮到红棋落子，奇数表示轮到黑棋落�
 var room;
 var isOver = false;  // 为true时即游戏结束不能再移动棋子
 var timer;
-var onlyPopOne = false;  // 只弹出一次游戏结果，为true时即游戏结束不再弹出
 $(function(){
 	responsive();     // 响应式设计
 	checkerboard();    // 绘制棋盘
@@ -93,13 +92,8 @@ window.onmousedown = function(event) {
 		// 第二次点击，点击到空位或对方棋子了
 		if(isConformRule(firstChess, firstChess.x, firstChess.y, chessX, chessY)){
 			turn++;
-			if(mark[chessX][chessY].name === "将" ){
+			if (mark[chessX][chessY].name === "将" || mark[chessX][chessY].name === "帅") {
 				isOver = true;
-				if(room === undefined)  alert("红棋胜！" + "\n" + "双方共行了" + turn + "步棋。");   // 单独为单人模式弹出结果信息
-			}
-			else if(mark[chessX][chessY].name === "帅") {
-				isOver = true;
-				if(room === undefined)  alert("黑棋胜！" + "\n" + "双方共行了" + turn + "步棋。");
 			}
 			mark[chessX][chessY] = Object.assign(firstChess);  // 将棋子移动到第二次点击的位置
 			mark[chessX][chessY].x = chessX;
@@ -243,7 +237,6 @@ function init() {
 	mark[6][8] = blackPawn5;
 	turn = 0;
 	isOver = false;
-	onlyPopOne = false;
 	changeChess();
 }
 
@@ -256,7 +249,8 @@ function changeChess() {
 		for(var j=0; j<=8; j++){
 			drawChess(mark[i][j]);	
 		}
-	} 
+	}
+	gameOver();
 }
 
 // 进入房间
@@ -286,6 +280,21 @@ $("#new").click(function(){
 	init();
 });
 
+function gameOver() {
+	if(!isOver) {
+		return;
+	}
+	var redFail = true;
+	for(var i=0; i<=2; i++) {
+		for(var j=3; j<=5; j++) {
+			if(mark[i][j] !== 0 && mark[i][j].name === "帅"){
+				redFail = false;
+			}
+		}
+	}	
+	showDialog(`${redFail ? '黑棋' : '红棋'}胜!\n双方共行了${turn}步棋。`);
+}
+
 function sendInfo() {
 	$.ajax({
 		type: 'post',
@@ -305,49 +314,5 @@ function sendInfo() {
 		error: function(err) {
 			console.log(err);
 		},
-	});
-}
-
-function getInfo() {
-	$.ajax({
-		type: 'get',
-		url: baseUrl + '/get',
-		data: {
-			roomId: room
-		},
-		success: function(response) {
-			if (response) {
-				let group = JSON.parse(response);
-				turn = group.turn;
-				isOver = group.isOver;
-				mark = JSON.parse(group.mark);
-				console.log(mark);
-				changeChess();
-				if(isOver === true){			
-					var redFail = true;
-					for(var i=0; i<=2; i++) {
-						for(var j=3; j<=5; j++) {
-							if(mark[i][j] !== 0 && mark[i][j].name === "帅"){
-								redFail = false;
-							}
-						}
-					}	
-					if(redFail === true && onlyPopOne === false) {
-						onlyPopOne = true;
-						alert("黑棋胜！" + "\n" + "双方共行了" + turn + "步棋。");
-					}   
-					else if(redFail === false && onlyPopOne === false) {
-						onlyPopOne = true;
-						alert("红棋胜！" + "\n" + "双方共行了" + turn + "步棋。");
-					}
-				}
-			}	
-			else {   
-				init();
-			}
-		},
-		error: function(response) {
-			alert(response.status);
-		}
 	});
 }

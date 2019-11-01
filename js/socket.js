@@ -29,9 +29,17 @@ function establishWS() {
     mark = JSON.parse(data.mark);
     turn = data.turn;
     isOver = data.isOver;
-    console.log(mark);
+    console.log(data);
     changeChess();
   });
+
+  // 若下棋的两个人其中一方下线了，则出现弹框通知
+  socket.on('dropNotice', function(data) {
+    const { group, roomId } = data;
+    if (roomId === room) {
+      showDialog(`${group ? '黑棋' : '红棋'}已下线`);
+    }
+  })
 }
 
 // 判断客户端和服务器是否有连接

@@ -53,8 +53,6 @@ const io = require('socket.io')(app);
 var roomObj = {};
 
 io.on('connection', function (socket) {
-  console.log(1);
-
   socket.on('createRoom', function(room) {
     roomObj[room] = roomObj[room] ? roomObj[room] : [];
     // 第一个进入房间的人执红棋，第二个进入的执黑棋
@@ -88,9 +86,16 @@ io.on('connection', function (socket) {
       // 遍历房间中的每个客户端
       for (var i=0; i<clients.length; i++) {
         if(clients[i].id === socket.id) {
-          clients.splice(i, 1);
           room = roomId;
+          group = clients[i].group;
           end = true;
+          clients.splice(i, 1);
+          if (clients.length > 0 && (i === 0 || i === 1)) {
+            io.emit('dropNotice', {
+              group,
+              roomId
+            })
+          }
           break;
         }
         if(end) break;
