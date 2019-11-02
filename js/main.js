@@ -315,8 +315,25 @@ function sendInfo() {
 }
 
 $('#textarea').on('keydown', function(e) {
-	if (e.keyCode !== 13) {
-		return;
+	if (e.keyCode === 13) {
+		sentChatMessage(e.target.value);
 	}
-	console.log('send');
 })
+
+$('#textarea').on('keyup', function(e) {
+	if (e.keyCode === 13) {
+		$('#textarea').val('');
+	}
+})
+
+function showChatMessage(message) {
+	const messageArr = message.split('/\end\n/');
+	console.log(messageArr);
+	const $fragment = $(document.createDocumentFragment());
+	messageArr.forEach(function(val) {
+		const {identity, text, date} = JSON.parse(val);
+		$fragment.append(`<div class="font-box" data-identity=${identity}><p>${identity}: ${text}</p><p class="message-date">—${date}</p></div>`);
+	})
+	$('#messageBox').empty();
+	$('#messageBox').append($fragment);
+}

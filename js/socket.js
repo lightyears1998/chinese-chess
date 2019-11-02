@@ -51,6 +51,14 @@ function establishWS() {
       showDialog(`${group ? '黑棋' : '红棋'}已下线`);
     }
   })
+
+  socket.on('reciveChatMessage', function(data) {
+    const {room: roomId, message} = JSON.parse(data);
+    if (roomId === room) {
+      console.log(message);
+      showChatMessage(message);
+    }
+  })
 }
 
 // 判断客户端和服务器是否有连接
@@ -69,4 +77,16 @@ function closeWs(e) {
   if (judgeConnecting()) {
     socket.close();
   }
+}
+
+function sentChatMessage(value) {
+  const identity = (clientInfo.group === 0 ? '红棋' : (clientInfo.group === 1 ? '黑棋' : '观众')); 
+  socket.emit('sendChatMessage', JSON.stringify({
+    room,
+    message: {
+      identity,
+      text: value,
+      date: getTime()
+    }
+  }));
 }

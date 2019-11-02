@@ -63,7 +63,7 @@ textarea {
 }
 .message-box {
 	width: 100%;
-	max-height: calc(100% - 100px);
+	height: calc(100% - 100px);
 	overflow: auto;
 	border: 1px solid #eee;
 }
@@ -74,9 +74,36 @@ textarea {
 	border-bottom: 1px solid #eee;
 	display: flex;
 	align-items: center;
+	flex-wrap: wrap;
 	box-sizing: border-box;
 	padding: 10px;
 }
+.font-box p {
+	width: 100%;
+}
+.font-box p:last-child {
+	margin-left: auto;
+	width: auto;
+}
+.font-box[data-identity='红棋']:before {
+	content: '';
+	width: 3px;
+	height: 100%;
+	display: inline-block;
+	position: absolute;
+	left: 0;
+	background-color: red;
+}
+.font-box[data-identity='黑棋']:before {
+	content: '';
+	width: 3px;
+	height: 100%;
+	display: inline-block;
+	position: absolute;
+	left: 0;
+	background-color: black;
+}
+
 .input-box {
 	position: absolute;
 	bottom: 0;

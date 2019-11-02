@@ -51,6 +51,7 @@ const app = http.createServer(function(req, res) {
 
 const io = require('socket.io')(app);
 var roomObj = {};
+var roomMessageObj = {};
 
 io.on('connection', function (socket) {
   socket.on('enterRoom', function(room) {
@@ -95,6 +96,8 @@ io.on('connection', function (socket) {
               group,
               roomId
             })
+          } else if (clients.length === 0) {
+            roomMessageObj[roomId] = '';
           }
           break;
         }
@@ -107,6 +110,16 @@ io.on('connection', function (socket) {
         roomClientCount: roomObj[room].length,
       });
     }
+  });
+
+  socket.on('sendChatMessage', function(data) {
+    const {room, message} = JSON.parse(data);
+    // 使用 /\end\n/ 来区分每一条消息，方便前端提取
+    roomMessageObj[room] = roomMessageObj[room] ?  JSON.stringify(message) + '/\end\n/' + roomMessageObj[room] : JSON.stringify(message);
+    io.emit('reciveChatMessage', JSON.stringify({
+      message: roomMessageObj[room],
+      room
+    }))
   })
 });
 
