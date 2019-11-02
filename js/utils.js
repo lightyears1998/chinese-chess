@@ -16,22 +16,14 @@ var showDialog = throttle(function(message) {
   $('#dialog').fadeIn(200);
   $('#dialog').text(message);
   setTimeout(function() {
-    $('#dialog').fadeOut(700);
+    $('#dialog').fadeOut(500);
   }, messageTime)
 }, 500);
 
 function getTime() {
 	var date= new Date();
-	var year= date.getFullYear();
-	var month= formatTime(date.getMonth() + 1);
-	var day= formatTime(date.getDate());
-  var s = Math.floor(date.getSeconds());
-  var m = Math.floor(date.getMinutes() + s / 60);
-  var h = Math.floor(date.getHours() % 12 + m / 60);
-  h = formatTime(h);
-  m = formatTime(m);
-  s = formatTime(s);
-  return `${year}/${month}/${day}—${h}:${m}:${s}`;
+  return `${date.getFullYear()}/${formatTime(date.getMonth() + 1)}/${formatTime(date.getDate())}
+  —${formatTime(date.getHours())}:${formatTime(date.getMinutes())}:${formatTime(date.getSeconds())}`;
 }
 
 function formatTime(time) {

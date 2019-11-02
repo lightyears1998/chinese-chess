@@ -26,18 +26,36 @@ function establishWS() {
       } else {
         showDialog(`成功进入${room}号房`);
       }
-      // 本客户端已连接上（第一个连接的人所以是红棋），而黑棋刚连接上服务器
-    } else if (obj.clientInfo && obj.clientInfo.group === 1) {
-      showDialog('黑棋已上线'); 
+    } else if (obj.clientInfo) {
+      // 使新上线的客户端能够获取到当前的棋盘信息
+      if (clientInfo.group !== 2) {
+        callServer();
+      }
+      if (obj.clientInfo.group === 1) {
+        showDialog('黑棋已上线'); 
+      } else if (obj.clientInfo.group === 0) {
+        showDialog('红棋已上线'); 
+      }
     }
+    //   // 只在红棋的的客户端上显示。本客户端已连接上，而黑棋刚连接上服务器
+    // } else if (obj.clientInfo && obj.clientInfo.group === 1 && clientInfo.group !== 2) {
+    //   showDialog('黑棋已上线'); 
+    //   // 使新上线的客户端能够获取到当前的棋盘信息
+    //   callServer(); 
+    //   // 只在黑棋的的客户端上显示。本客户端已连接上，但红棋下线了又重新上线
+    // } else if (obj.clientInfo && obj.clientInfo.group === 0 && clientInfo.group !== 2) {
+    //   showDialog('红棋已上线'); 
+    //   // 使新上线的客户端能够获取到当前的棋盘信息
+    //   callServer()
+    // }
     console.log(clientInfo);
     $('#peopleCount').text(obj.roomClientCount);
   })
   
   // 服务器有更新，接受新的棋盘信息
   socket.on('serverChange', function(data) {
+    console.log("recive serverChange");
     if (data.roomId === room) {
-      console.log("recive serverChange");
       mark = JSON.parse(data.mark);
       turn = data.turn;
       isOver = data.isOver;
@@ -73,9 +91,14 @@ function judgeConnecting() {
 }
 
 // 移动棋子后通知服务器
-function callServer(data) {
+function callServer() {
   if (judgeConnecting()) {
-    socket.emit('clientChange', data);
+    socket.emit('clientChange', {
+      roomId: room,
+      turn: turn,
+      isOver: isOver,
+      mark: JSON.stringify(mark)
+    });
   }
 }
 

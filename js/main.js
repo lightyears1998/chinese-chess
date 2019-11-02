@@ -65,6 +65,14 @@ window.onmousedown = function(event) {
 	if (!(chessY >= 0 && chessY <= 8 && chessX >= 0 && chessX <= 9 && isOver !== true)) {
 		return;
 	}
+	if (!clientInfo) {
+		showDialog('请先进入房间再开始游戏');
+		return;
+	}
+	if (clientInfo.group === 2) {
+		showDialog('你是观众，不能下棋');
+		return;
+	}
 	if (turn % 2 !== clientInfo.group && mark[chessX][chessY] !== 0) {
 		showDialog('轮到对方下棋了');
 		return;
@@ -102,12 +110,7 @@ window.onmousedown = function(event) {
 			isClick = false;  		
 			if($("#roomId").val().trim() !== '') {  // 如果没有填写房间号则是单人模式，不需用到服务器
 				// 通知服务器更新，
-				callServer({
-					roomId: room,
-					turn: turn,
-					isOver: isOver,
-					mark: JSON.stringify(mark)
-				});  
+				callServer();  
 			}
 			// changeChess();	// 重新绘制棋子位置
 			playAudio();  // 播放下棋音效
@@ -317,6 +320,14 @@ function sendInfo() {
 
 $('#textarea').on('keydown', function(e) {
 	if (e.keyCode === 13) {
+		if (!clientInfo) {
+			showDialog('进入房间后才能发送消息哦');
+			return;
+		}
+		if (e.target.value.trim() === '') {
+			showDialog('不能发送空消息');
+			return;
+		}
 		sentChatMessage(e.target.value);
 	}
 })

@@ -9,7 +9,12 @@ io.on('connection', function (socket) {
   socket.on('enterRoom', function(room) {
     roomObj[room] = roomObj[room] ? roomObj[room] : [];
     // 第一个进入房间的人执红棋0，第二个进入的执黑棋1，之后进入的是观众2
-    const group = (roomObj[room].length === 0 ? 0 : (roomObj[room].length === 1 ? 1 : 2));
+    var group = (roomObj[room].length === 0 ? 0 : (roomObj[room].length === 1 ? 1 : 2));
+    // 房间只有1个人并且是黑棋（红棋下线了），则进入房间的人执红棋
+    if (roomObj[room].length === 1 && roomObj[room][0].group === 1) {
+      console.log('again');
+      group = 0;
+    }
     roomObj[room].push({
       id: socket.id,
       group
@@ -29,7 +34,6 @@ io.on('connection', function (socket) {
   });
 
   socket.on('disconnect', function() {
-    console.log('client断开连接了');
     var room = null;
     // 寻找离线客户端所在的房间，并从房间中删除
     for(var [roomId, clients] of Object.entries(roomObj)) {
