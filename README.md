@@ -33,7 +33,7 @@ Rebuild the project with Vue and support for mobile gaming.
 
   - [ ] 增加聊天室。
 
-  - [x] 博弈双方上下线通知，当前房间人数统计。 
+  - [x] 下棋双方上下线通知，当前房间人数统计。 
 
 - 代码
   - [x] 取消原先的 php 代码，使用 node 重写。

@@ -13,7 +13,8 @@ a {
 }
 
 input,
-button {
+button,
+textarea {
 	outline: none;
 }
 
@@ -35,32 +36,59 @@ button {
 	padding: 10px;
 }
 
-.room {
-	height: 25px;
-}
 .room input {
 	width: 200px;
-	height: 100%;
+	height: 25px;
 }
 .enter-room {
 	width: 70px;
-  height: 100%;
+  height: 25px;
 	border-radius: 4px;
 	cursor: pointer;
 }
 .new {
 	width: 70px;
-	height: 100%;
+	height: 25px;
 	margin-left: 10px;
 	text-align: center;
 	border-radius: 4px;
 	cursor: pointer;
 }
 
-.chat-box {
+.chat-container {
 	width: 100%;
 	height: calc(100% - 50px);
-	margin-top: 20px;
+	margin-top: 10px;
+	position: relative;
+}
+.message-box {
+	width: 100%;
+	max-height: calc(100% - 100px);
+	overflow: auto;
+	border: 1px solid #eee;
+}
+.font-box {
+	position: relative;
+	width: 100%;
+	min-height: 30px;
+	border-bottom: 1px solid #eee;
+	display: flex;
+	align-items: center;
+	box-sizing: border-box;
+	padding: 10px;
+}
+.input-box {
+	position: absolute;
+	bottom: 0;
+	width: 100%;
+	height: 60px;
+	min-width: 300px;
+	margin: 20px 20px 20px 0;
+}
+.input-box textarea {
+	width: 90%;
+	height: 100%;
+	font-size: 14px;
 }
 
 .dialog {
