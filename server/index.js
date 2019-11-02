@@ -10,10 +10,20 @@ io.on('connection', function (socket) {
     roomObj[room] = roomObj[room] ? roomObj[room] : [];
     // 第一个进入房间的人执红棋0，第二个进入的执黑棋1，之后进入的是观众2
     var group = (roomObj[room].length === 0 ? 0 : (roomObj[room].length === 1 ? 1 : 2));
-    // 房间只有1个人并且是黑棋（红棋下线了），则进入房间的人执红棋
-    if (roomObj[room].length === 1 && roomObj[room][0].group === 1) {
-      console.log('again');
+    // 若双方有人掉线，下一个进入房间的人则顶替空缺的位置。如果双方都掉线了，则优先顶替红棋
+    var haveRed = false;
+    var haveBlack = false;
+    for (var i=0; i<roomObj[room].length; i++) {
+      if (roomObj[room][i].group === 0) {
+        haveRed = true;
+      } else if (roomObj[room][i].group === 1) {
+        haveBlack = true;
+      }
+    }
+    if (!haveRed) {
       group = 0;
+    } else if (!haveBlack) {
+      group = 1;
     }
     roomObj[room].push({
       id: socket.id,
@@ -22,11 +32,18 @@ io.on('connection', function (socket) {
     // 和客户端建立通信后给客户端发送 服务器和这个客户端的通信id，以此来区分和不同客户端的连接
     io.emit('clientInfo', {
       roomClientCount: roomObj[room].length,
+      roomId: room,
       clientInfo: {
         id: socket.id,
         group
       }
     });
+    if (roomMessageObj[room]) {
+      io.emit('clientReciveChatMessage', JSON.stringify({
+        message: roomMessageObj[room],
+        room
+      }))
+    }
   })
 
   socket.on('clientChange', function (data) {
@@ -65,11 +82,11 @@ io.on('connection', function (socket) {
     }
   });
 
-  socket.on('sendChatMessage', function(data) {
+  socket.on('clientSendChatMessage', function(data) {
     const {room, message} = JSON.parse(data);
     // 使用 /\end\n/ 来区分每一条消息，方便前端提取
     roomMessageObj[room] = roomMessageObj[room] ?  JSON.stringify(message) + '/\end\n/' + roomMessageObj[room] : JSON.stringify(message);
-    io.emit('reciveChatMessage', JSON.stringify({
+    io.emit('clientReciveChatMessage', JSON.stringify({
       message: roomMessageObj[room],
       room
     }))

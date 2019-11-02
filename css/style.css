@@ -3,10 +3,6 @@
 	padding: 0;
 }
 
-body {
-	font-family: Helvetica Neue,Helvetica,PingFang SC,Microsoft YaHei,Tahoma,Arial;
-}
-
 a {
 	text-decoration: none;
 	color: rgb(233, 221, 182);
@@ -21,7 +17,6 @@ textarea {
 .app {
 	display: flex;
 }
-
 
 .box {
 	display: block;

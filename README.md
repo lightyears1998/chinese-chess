@@ -1,7 +1,7 @@
 # Chinese chess on the web  
 
 ## Technology stack
-jQuery + ajax + php
+Jquery + Node + Socket.io
 
 ## Introduction
 If both parties enter the same room number, it is a double mode. Otherwise, it is in single mode.

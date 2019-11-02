@@ -9,6 +9,7 @@ var ceilWidth, ceilHeight;  // 格子大小
 var chessSize;   // 棋子大小
 var chessFontSize;  // 棋子文字大小
 var mark = new Array();   // 标记棋盘上该位置是否有棋子
+var clickNewGame = null;
 // 棋子对象
 var redKing = new Chess("red", "帅", 0, 4);
 	redGuard1 = new Chess("red", "士", 0, 3);
@@ -240,6 +241,7 @@ function init() {
 	mark[6][8] = blackPawn5;
 	turn = 0;
 	isOver = false;
+  clickNewGame = null;
 	changeChess();
 }
 
@@ -277,8 +279,14 @@ $("#btn").click(function(){
 });
 
 // 重新开始
-$("#new").click(function(){
-	init();
+$("#new").click(function() {
+	if (clientInfo && clientInfo.group === 2) {
+		showDialog('你是观众，不能重新开始游戏');
+	} else if (clientInfo && clientInfo.group !== 2)
+		init();
+		clickNewGame = clientInfo.group;
+		callServer();
+		clickNewGame = null;
 });
 
 function gameOver() {
@@ -294,28 +302,6 @@ function gameOver() {
 		}
 	}	
 	showDialog(`${redFail ? '黑棋' : '红棋'}胜!\n双方共行了${turn}步棋。`);
-}
-
-function sendInfo() {
-	$.ajax({
-		type: 'post',
-		url : baseUrl + '/set',
-		data: {
-			roomId: room,
-			turn: turn,
-			isOver: isOver,
-			mark: JSON.stringify(mark)
-		},
-		success: function(res) {
-			const { roomExist } = JSON.parse(res);
-			if (roomExist) {
-				showDialog('房间已存在，沿用已经存在的棋盘信息');
-			}
-		},
-		error: function(err) {
-			console.log(err);
-		},
-	});
 }
 
 $('#textarea').on('keydown', function(e) {

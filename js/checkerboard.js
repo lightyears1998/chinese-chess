@@ -1,5 +1,5 @@
 const chessColor = "rgb(221, 200, 113)";
-const firstClickChessColor = "rgb(218, 191, 78)";
+const firstClickChessColor = "rgb(224, 192, 56)";
 
 // 绘制棋盘
 function checkerboard() {	
