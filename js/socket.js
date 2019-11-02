@@ -2,7 +2,7 @@ var socket = null;
 var clientInfo = null;
 
 function establishWS() {
-  socket = io('ws://localhost:88');
+  socket = io('ws://dangosky.com:2222');
   socket.on('connect', function() {
     console.log('成功连接服务器');
     socket && socket.emit('enterRoom', room);

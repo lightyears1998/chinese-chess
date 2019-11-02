@@ -1,5 +1,7 @@
+console.log(process.env.NODE_ENV);
+
 const server = require('http').createServer();
-server.listen(88);
+server.listen(2222);
 
 const io = require('socket.io')(server);
 var roomObj = {};
