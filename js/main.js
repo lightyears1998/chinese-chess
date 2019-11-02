@@ -266,6 +266,7 @@ $("#btn").click(function(){
 	}
 	if (val !== room) {
 		closeWs();
+		init();
 	}
 	room = val;
 	// 进入房间后建立websocket
@@ -328,7 +329,6 @@ $('#textarea').on('keyup', function(e) {
 
 function showChatMessage(message) {
 	const messageArr = message.split('/\end\n/');
-	console.log(messageArr);
 	const $fragment = $(document.createDocumentFragment());
 	messageArr.forEach(function(val) {
 		const {identity, text, date} = JSON.parse(val);
