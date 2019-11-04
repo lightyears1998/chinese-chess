@@ -14,10 +14,6 @@ First click on the chess pieces you want to move (the red flag should be carried
 ## Expected improvement
 Rebuild the project with Vue and support for mobile gaming.
 
----
-
-**Welcome to provide your issues, pull requests and ideas!**
-
 
 ## 2019.10 更新日记
 
@@ -33,10 +29,33 @@ Rebuild the project with Vue and support for mobile gaming.
 
   - [x] 判断下棋双方的身份，不允许第三方插手 && 不允许控制对方的棋子。
 
-> 不再支持单机模式。如果想要一个人下棋，可打开页面一个使用红棋一个使用黑棋。
+> 不再支持单机模式。如果想要一个人下棋，可打开两个页面一个使用红棋一个使用黑棋。
 
 - 代码
   - [x] 取消原先的 php 代码，使用 node 重写。
 
   - [x] 取消 Ajax 轮询服务器，使用 webSocket 进行通信。
+
+## 服务器运行
+
+```sh
+git clone <url>
+npm install
+npm start;  # npm run start:dev; OR; yarn start:dev
+exit;  # Disconnect from server, this also terminates node process.
+
+# If you want to keep your server running after you disconnect,
+# use `screen node index.js` or pm2;
+npm install --global pm2
+pm2 start index.js --name chess-server --watch  # --watch means pm2 will be resetart automatic when you change the code
+pm2 stop chess-server
+pm2 restart chess-server
+pm2 list
+pm2 monit
+```
+
+
+---
+
+**Welcome to provide your issues, pull requests and ideas!**
 

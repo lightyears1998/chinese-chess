@@ -1,8 +1,9 @@
 var socket = null;
 var clientInfo = null;
+var remoteUrl = window.location.href.includes('dangosky.com') ? 'ws://dangosky.com:2222' : 'ws://localhost:2222';
 
 function establishWS() {
-  socket = io('ws://dangosky.com:2222');
+  socket = io(remoteUrl);
   socket.on('connect', function() {
     console.log('成功连接服务器');
     socket && socket.emit('enterRoom', room);

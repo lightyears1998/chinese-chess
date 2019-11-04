@@ -265,6 +265,10 @@ $("#btn").click(function(){
 		showDialog('若要进入联机模式则房间号不能为空');
 		return;
 	}
+	if (!/^[\d]+$/.test(val)) {
+		showDialog('房间号只能为数字');
+		return;
+	}
 	if (val === room) {
 		showDialog('你已经在 ' + room + ' 房间了');
 		return;
@@ -301,7 +305,7 @@ function gameOver() {
 			}
 		}
 	}	
-	showDialog(`${redFail ? '黑棋' : '红棋'}胜!\n双方共行了${turn}步棋。`);
+	alert(`${redFail ? '黑棋' : '红棋'}胜!\n双方共行了${turn}步棋。`);
 }
 
 $('#textarea').on('keydown', function(e) {
@@ -329,7 +333,8 @@ function showChatMessage(message) {
 	const $fragment = $(document.createDocumentFragment());
 	messageArr.forEach(function(val) {
 		const {identity, text, date} = JSON.parse(val);
-		$fragment.append(`<div class="font-box" data-identity=${identity}><p>${identity}: ${text}</p><p class="message-date">—${date}</p></div>`);
+		const str = `${identity}: ${text}`.replace(/</g, "%3C").replace(/>/g, "%3E"); // 转义 < 和 >，防止xss攻击
+		$fragment.append(`<div class="font-box" data-identity=${identity}><p>${str}</p><p class="message-date">—${date}</p></div>`);
 	})
 	$('#messageBox').empty();
 	$('#messageBox').append($fragment);
