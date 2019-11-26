@@ -113,7 +113,6 @@ window.onmousedown = function(event) {
 				// 通知服务器更新，
 				callServer();  
 			}
-			// changeChess();	// 重新绘制棋子位置
 			playAudio();  // 播放下棋音效
 		}
 		else {
@@ -328,6 +327,7 @@ $('#textarea').on('keyup', function(e) {
 	}
 })
 
+// 显示聊天室信息
 function showChatMessage(message) {
 	const messageArr = message.split('/\end\n/');
 	const $fragment = $(document.createDocumentFragment());

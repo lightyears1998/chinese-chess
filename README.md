@@ -1,19 +1,30 @@
-# Chinese chess on the web  
+# Web版双人中国象棋  
 
-## Technology stack
-Jquery + Node + Socket.io
+## 技术栈
 
-## Introduction
-If both parties enter the same room number, it is a double mode. Otherwise, it is in single mode.
+Canvas + Jquery + Node + Socket.io
 
-This version of Chinese chess does not verify the two players, which means either side can control red and black chess. So consciously abide by the rules of playing chess.   
+## 游戏规则
 
-## The rules of the game
-First click on the chess pieces you want to move (the red flag should be carried first), and then click on the position you want to move. If you follow the rules of Chinese chess, you can move successfully. The red and black sides alternate until the end of the game.
+博弈双方约定好房间号进入房间，第一个进入房间的人执红旗先行，第二个进入房间执黑棋后手，之后进入房间的是观众，只能观看棋局变化，无法控制棋子和重新开始游戏按钮。
 
-## Expected improvement
-Rebuild the project with Vue and support for mobile gaming.
+若下棋过程中博弈双方有人掉线，则下一个进入房间的人顶替下线方进行下棋。若博弈双方都掉线了，则下一个进入房间的执红旗，下下个进入的执黑棋。
 
+## 目录结构
+
+```
+-index.html：页面入口
+-js
+  -main.js：游戏初始化
+  -checkerboard.js：绘画棋盘的相关函数
+  -rule.js：棋子行动规则的相关函数
+  -utils.js：一些公用的函数
+  -socket.js：前端socket代码
+-css
+  -style.css：页面样式
+-server
+  - index.js：后端socket代码
+```
 
 ## 2019.10 更新日记
 
@@ -29,12 +40,15 @@ Rebuild the project with Vue and support for mobile gaming.
 
   - [x] 判断下棋双方的身份，不允许第三方插手 && 不允许控制对方的棋子。
 
-> 不再支持单机模式。如果想要一个人下棋，可打开两个页面一个使用红棋一个使用黑棋。
-
 - 代码
   - [x] 取消原先的 php 代码，使用 node 重写。
 
   - [x] 取消 Ajax 轮询服务器，使用 webSocket 进行通信。
+
+- 功能取消
+  - 不再支持单机模式。如果想要一个人下棋，可打开两个页面一个使用红棋一个使用黑棋。
+
+  - 不再保留棋盘信息。原先的 php 代码是将棋盘信息保存在服务器的文件上，现在直接在进入房间的客户端之间传递棋盘信息。
 
 ## 服务器运行
 
@@ -53,9 +67,3 @@ pm2 restart chess-server
 pm2 list
 pm2 monit
 ```
-
-
----
-
-**Welcome to provide your issues, pull requests and ideas!**
-
