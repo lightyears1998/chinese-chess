@@ -20,52 +20,71 @@ const blackNumber = [0, '１', '２', '３', '４', '５', '６', '７', '８', 
 function getNotion(chess, fromChessX, fromChessY, toChessX, toChessY) {
     let move = '';
     const {name, group} = chess;
+    const number = group === 'red' ? redNumber : blackNumber;
 
-    move += name;
-
+    // 起始纵线与结束纵线
+    let fromCol, toCol
     if (group === 'red') {
-        let fromCol = redNumber[1 + fromChessY ];
-        let toCol = redNumber[1 + toChessY];
+        fromCol = number[1 + fromChessY];
+        toCol = number[1 + toChessY];
+    } else {
+        fromCol = number[9 - fromChessY]
+        toCol = number[9 - toChessY];
+    }
 
-        if (fromChessX === toChessX) { // 红平
-            move += `${fromCol}平${toCol}`;
-        } else if (fromChessX > toChessX) { // 红退
-            if (fromCol === toCol) {
-                let step = redNumber[fromChessX - toChessX];
-                move += `${fromCol}退${step}`;
-            } else {
-                move += `${fromCol}退${toCol}`;
-            }
-        } else if (fromChessX < toChessX) { // 红进
-            if (fromCol === toCol) {
-                let step = redNumber[toChessX - fromChessX];
-                move += `${fromCol}进${step}`;
-            } else {
-                move += `${fromCol}进${toCol}`;
+    // 判断方向
+    let direction = '';
+    if (fromChessX === toChessX) {
+        direction = '平';
+    } else {
+        direction = (group === 'red' ? 1 : 0) ^ (fromChessX < toChessX ? 1 : 0) === 0 ? '进' : '退';
+    }
+
+    // 检查同名棋子
+    let sameNameChessInSameRow = [];
+    for (let i = 0; i < 10; ++i) {
+        if (mark[i][chess.y]) {
+            const checking = mark[i][chess.y]
+            if (checking.group === group && checking.name === name) {
+                sameNameChessInSameRow.push(checking)
             }
         }
-    } else { // group === 'black'
-        let fromCol = blackNumber[9 - fromChessY];
-        let toCol = blackNumber[9 - toChessY];
+    }
 
-        if (fromChessX === toChessX) { // 黑平
-            move += `${fromCol}平${toCol}`;
-        } else if (fromChessX > toChessX) { // 黑进
-            if (fromCol === toCol) {
-                let step = blackNumber[fromChessX - toChessX];
-                move += `${fromCol}进${step}`;
-            } else {
-                move += `${fromCol}进${toCol}`
-            }
+    // 将同名棋子按记谱方法上的前后顺序排列
+    if (group === 'red') {
+        sameNameChessInSameRow.reverse();
+    }
 
-        } else if (fromChessX < toChessX) { // 黑退
-            if (fromCol === toCol) {
-                let step = blackNumber[toChessX - fromChessX];
-                move += `${col}退${step}`;
-            } else {
-                move += `${fromCol}退${toCol}`;
+    // 若同纵无其他同名棋子
+    if (sameNameChessInSameRow.length === 1) {
+        move = `${name}${fromCol}${direction}`;
+    } else { // 若同纵有同名棋子
+        if (name !== '兵' && name !== '卒') { // 非兵卒的棋子最多有两个，用前后可以区分
+            const sort = sameNameChessInSameRow.indexOf(chess) === 0 ? '前' : '后';
+            move = `${sort}${name}${direction}`;
+        } else {
+            let sort = ''
+            if (sameNameChessInSameRow.length === 2) { // 兵卒只有两个时，用前后予以区分
+                sort = sameNameChessInSameRow.indexOf(chess) === 0 ? '前' : '后';
+            } else { // 兵卒多于两个时，用前二三四五予以区分
+                const index = sameNameChessInSameRow.indexOf(chess);
+                if (index === 0) {
+                    sort = '前'
+                } else {
+                    sort = number[1 + index]
+                }
             }
+            move = `${sort}${fromCol}${direction}`
         }
+    }
+
+    // 起始纵线与终止纵线相同，则记谱采用步数
+    if (fromCol === toCol) {
+        const step = number[Math.abs(fromChessX - toChessX)]
+        move += step
+    } else { // 起始纵线与终止纵线不同，则记谱采用终止纵线
+        move += toCol
     }
 
     return move
